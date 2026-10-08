@@ -85,6 +85,10 @@ class Player {
       this.shieldT -= dt * (this.shieldLvl > 1 ? 1.6 : 1);
       if (this.shieldT <= 0) { this.shield = 1; Sound.play('shield'); FX.ring(this.x, this.y, 10, 40, '#7df9ff', 0.4); }
     }
+    if ((this.moving || this.dashT > 0) && Math.random() < dt * 24) {   // propeller bubbles
+      const back = Math.cos(this.aim) < 0 ? 1 : -1;
+      FX.parts.push({ x: this.x + back * 30, y: this.y + rand(-2, 6), vx: back * rand(10, 50), vy: rand(-45, -10), life: 0.8, max: 0.8, size: rand(2, 4), color: '#cfefff' });
+    }
     this.orbAng += dt * 4.2;
     this.invuln -= dt; this.hurtT -= dt;
   }
@@ -110,7 +114,7 @@ class Player {
       const crit = Math.random() < this.crit;
       let dmg = w.dmg * this.dmgMul * (1 - 0.07 * this.multi);
       if (crit) dmg *= 2.5;
-      const b = new Bullet(this.x + Math.cos(this.aim) * w.muzzle, this.y + 2 + Math.sin(this.aim) * w.muzzle, a, w.speed, dmg, true);
+      const b = new Bullet(this.x + Math.cos(this.aim) * w.muzzle, this.y - 8 + Math.sin(this.aim) * w.muzzle, a, w.speed, dmg, true);
       b.r = w.size; b.color = crit ? '#ffffff' : w.color; b.glowColor = w.color; b.life = w.life;
       b.pierce = (w.pierce || 0) + this.pierce; b.bounce = this.bounce;
       b.explode = Math.max(w.explode || 0, this.explode ? 38 + this.explode * 16 : 0);
@@ -120,7 +124,7 @@ class Player {
     }
     this.fireT = 1 / (w.rate * this.rateMul);
     Sound.play(w.sfx); FX.addShake(w.shake);
-    const mx = this.x + Math.cos(this.aim) * w.muzzle, my = this.y + 2 + Math.sin(this.aim) * w.muzzle;
+    const mx = this.x + Math.cos(this.aim) * w.muzzle, my = this.y - 8 + Math.sin(this.aim) * w.muzzle;
     FX.spark(mx, my, this.aim, 3, w.color, 240);
     this.vx -= Math.cos(this.aim) * w.kick * 0.25; this.vy -= Math.sin(this.aim) * w.kick * 0.25;
   }
@@ -139,25 +143,22 @@ class Player {
     if (flick) return;
     const dashing = this.dashT > 0, moving = this.moving || dashing;
     const flip = Math.cos(this.aim) < 0 ? -1 : 1;
-    const bob = moving ? -Math.abs(Math.sin(G.anim * 15)) * 3 : Math.sin(G.anim * 3) * 0.8;
-    // shadow + glow
-    g.fillStyle = 'rgba(0,0,0,.4)'; g.beginPath(); g.ellipse(this.x, this.y + 17, 12, 4.5, 0, 0, TAU); g.fill();
-    g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.28;
-    g.drawImage(FX.glow('#7df9ff', 64), this.x - 38, this.y - 38, 76, 76);
+    const bob = Math.sin(G.anim * 2.6) * 2.2;
+    // soft glow from the sub's lights
+    g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.22;
+    g.drawImage(FX.glow('#ffe9a0', 64), this.x - 46, this.y - 46, 92, 92);
     g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
-    const gun = 'gun_' + this.weapons[this.wi], behind = Math.sin(this.aim) < -0.45;
-    const gy = this.y + 3 + bob * 0.6, kick = Math.max(0, this.fireT * 0.6) * 2;
-    if (behind) Sprites.drawGun(g, gun, this.x - Math.cos(this.aim) * kick, gy - Math.sin(this.aim) * kick, this.aim);
-    Sprites.draw(g, 'player', this.x, this.y + 2, {
+    const tilt = clamp(this.vy * 0.0009, -0.2, 0.2) * flip;
+    Sprites.draw(g, 'player', this.x, this.y, {
       scale: 2, flip, bob, flash: dashing || this.hurtT > 0.22,
-      sx: dashing ? 1.25 : 1 + (moving ? Math.sin(G.anim * 30) * 0.03 : 0), sy: dashing ? 0.85 : 1,
-      rot: moving ? Math.sin(G.anim * 15) * 0.07 : 0
+      sx: dashing ? 1.18 : 1, sy: dashing ? 0.9 : 1, rot: tilt + (moving ? Math.sin(G.anim * 14) * 0.015 : 0)
     });
-    if (!behind) Sprites.drawGun(g, gun, this.x - Math.cos(this.aim) * kick, gy - Math.sin(this.aim) * kick, this.aim);
+    const kick = Math.max(0, this.fireT * 0.6) * 2;
+    Sprites.drawGun(g, 'gun_' + this.weapons[this.wi], this.x - Math.cos(this.aim) * kick, this.y - 8 + bob - Math.sin(this.aim) * kick, this.aim);
     // shield
     if (this.shield > 0) {
       g.strokeStyle = 'rgba(125,249,255,' + (0.5 + Math.sin(G.anim * 6) * 0.2) + ')'; g.lineWidth = 2;
-      g.beginPath(); g.arc(this.x, this.y, 20, 0, TAU); g.stroke();
+      g.beginPath(); g.arc(this.x, this.y, 30, 0, TAU); g.stroke();
       g.fillStyle = 'rgba(125,249,255,.08)'; g.fill();
     }
     // orbital blades

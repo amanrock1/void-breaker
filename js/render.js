@@ -3,7 +3,7 @@
    render.js  -  everything drawn on the canvas: world, HUD, minimap
    ========================================================== */
 const Render = {
-  ctx: null, vignette: null, stars: [],
+  ctx: null, vignette: null, stars: [], bubbles: [],
 
   init(ctx) {
     this.ctx = ctx;
@@ -12,7 +12,8 @@ const Render = {
     gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.65)');
     g.fillStyle = gr; g.fillRect(0, 0, W, H);
     this.vignette = c;
-    for (let i = 0; i < 70; i++) this.stars.push({ x: rand(0, W), y: rand(0, H), s: rand(0.3, 1.4), c: pick(['#38e1ff', '#d65bff', '#5dff8a', '#ff5d6c']), z: rand(0.2, 1) });
+    for (let i = 0; i < 44; i++) this.bubbles.push({ x: rand(0, W), y: rand(0, H), r: rand(1.5, 5), s: rand(14, 42), ph: rand(0, 6) });
+    for (let i = 0; i < 0; i++) this.stars.push({ x: rand(0, W), y: rand(0, H), s: rand(0.3, 1.4), c: pick(['#38e1ff', '#4de1ff', '#5dff8a', '#ff5d6c']), z: rand(0.2, 1) });
   },
 
   draw() {
@@ -33,6 +34,7 @@ const Render = {
     if (s !== 'dying' && s !== 'over') G.player.draw(g);
     for (const b of G.bullets) b.draw(g);
     for (const b of G.ebullets) b.draw(g);
+    this.drawWater(g);
     FX.drawBelow(g);
     FX.drawText(g);
     g.restore();
@@ -47,30 +49,45 @@ const Render = {
     if (G.fade > 0) { g.fillStyle = 'rgba(0,0,0,' + G.fade + ')'; g.fillRect(0, 0, W, H); }
   },
 
+  /* underwater overlay: tint, drifting light rays, rising bubbles */
+  drawWater(g) {
+    const t = G.anim, th = G.theme;
+    g.fillStyle = th.tint; g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 4; i++) {
+      const x = ((i * 260 + t * 12) % (W + 360)) - 180, gr = g.createLinearGradient(x, 0, x - 120, H);
+      gr.addColorStop(0, rgba(th.edge, 0.07)); gr.addColorStop(1, rgba(th.edge, 0));
+      g.fillStyle = gr; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 90, 0); g.lineTo(x - 90, H); g.lineTo(x - 220, H); g.fill();
+    }
+    g.globalCompositeOperation = 'source-over';
+    for (const b of this.bubbles) {
+      const y = (((b.y - t * b.s) % (H + 20)) + H + 20) % (H + 20) - 10, x = b.x + Math.sin(t * 0.9 + b.ph) * 9;
+      g.strokeStyle = 'rgba(210,240,255,.28)'; g.lineWidth = 1; g.beginPath(); g.arc(x, y, b.r, 0, TAU); g.stroke();
+      g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(x - b.r * 0.4, y - b.r * 0.5, 1.5, 1.5);
+    }
+  },
+
   /* animated menu background */
   drawTitleBg(g) {
-    g.fillStyle = '#05060d'; g.fillRect(0, 0, W, H);
-    const t = G.anim;
-    g.strokeStyle = 'rgba(56,225,255,.10)'; g.lineWidth = 1; g.beginPath();
-    const off = (t * 20) % 40;
-    for (let x = -40 + off; x < W + 40; x += 40) { g.moveTo(x, 0); g.lineTo(x, H); }
-    for (let y = -40 + off; y < H + 40; y += 40) { g.moveTo(0, y); g.lineTo(W, y); }
-    g.stroke();
+    const t = G.anim, gr = g.createLinearGradient(0, 0, 0, H);
+    gr.addColorStop(0, '#0c4a6e'); gr.addColorStop(0.55, '#06203a'); gr.addColorStop(1, '#020812');
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
     g.globalCompositeOperation = 'lighter';
-    for (const s of this.stars) {
-      const x = (s.x + t * 18 * s.z) % W, y = (s.y + Math.sin(t * s.z + s.x) * 14 + H) % H;
-      g.globalAlpha = 0.25 + s.z * 0.4; g.fillStyle = s.c; g.fillRect(x, y, s.s * 3, s.s * 3);
-      g.globalAlpha = 0.12; g.drawImage(FX.glow(s.c, 64), x - 20, y - 20, 40, 40);
+    for (let i = 0; i < 6; i++) {
+      const x = ((i * 190 + t * 10) % (W + 300)) - 150, rg = g.createLinearGradient(x, 0, x - 160, H);
+      rg.addColorStop(0, 'rgba(120,220,255,.12)'); rg.addColorStop(1, 'rgba(120,220,255,0)');
+      g.fillStyle = rg; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 70, 0); g.lineTo(x - 130, H); g.lineTo(x - 260, H); g.fill();
     }
-    g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
-    // drifting neon shapes
-    for (let i = 0; i < 7; i++) {
-      const x = (i * 173 + t * (12 + i * 3)) % (W + 120) - 60, y = 90 + ((i * 97) % 420) + Math.sin(t * 0.7 + i) * 30;
-      const c = ['#ff5d6c', '#ffb347', '#ff7bd5', '#8aa0ff', '#6dff9e', '#c77dff', '#ffe14d'][i];
-      g.strokeStyle = c; g.globalAlpha = 0.35; g.lineWidth = 2;
-      polygon(g, x, y, 16 + (i % 3) * 8, 3 + (i % 5), t * (0.4 + i * 0.1)); g.stroke();
+    g.globalCompositeOperation = 'source-over';
+    const crew = [['grunt', 0.9, 120, 3], ['swarmer', 1.4, 230, 3], ['shooter', 0.4, 330, 3], ['dasher', 1.8, 420, 3], ['bomber', 0.6, 190, 3], ['tank', 0.5, 520, 3], ['swarmer', 1.1, 460, 3], ['player', 1.2, 300, 3]];
+    crew.forEach((c, i) => {
+      const dir = i % 2 ? -1 : 1, span = W + 200, x = dir > 0 ? ((i * 211 + t * 28 * c[1]) % span) - 100 : W + 100 - ((i * 173 + t * 28 * c[1]) % span);
+      Sprites.draw(g, c[0], x, c[2] + Math.sin(t * 0.8 + i) * 12, { scale: c[3], flip: dir, alpha: c[0] === 'player' ? 0.9 : 0.3 });
+    });
+    for (const b of this.bubbles) {
+      const y = (((b.y - t * b.s) % (H + 20)) + H + 20) % (H + 20) - 10, x = b.x + Math.sin(t * 0.9 + b.ph) * 9;
+      g.strokeStyle = 'rgba(210,240,255,.35)'; g.lineWidth = 1; g.beginPath(); g.arc(x, y, b.r * 1.3, 0, TAU); g.stroke();
     }
-    g.globalAlpha = 1;
     g.drawImage(this.vignette, 0, 0);
   },
 
@@ -105,12 +122,12 @@ const Render = {
     if (r.type === 'start' && G.floorNo === 1) {
       g.textAlign = 'center'; g.font = 'bold 14px Orbitron, "Segoe UI", sans-serif';
       g.fillStyle = 'rgba(125,249,255,.75)';
-      g.fillText('WASD - MOVE     MOUSE - AIM & SHOOT     SPACE - DASH', W / 2, H / 2 - 110);
+      g.fillText('WASD - SWIM     MOUSE - AIM & FIRE     SPACE - BOOST', W / 2, H / 2 - 110);
       g.fillStyle = 'rgba(125,249,255,.45)'; g.font = '12px Orbitron, "Segoe UI", sans-serif';
-      g.fillText('Step through a glowing door to begin. Doors lock until the room is cleared.', W / 2, H / 2 - 88);
+      g.fillText('Swim through a lit gap to begin. Gates seal until the room is cleared.', W / 2, H / 2 - 88);
     }
     if (r.type === 'treasure') { g.textAlign = 'center'; g.font = 'bold 16px Orbitron, sans-serif'; g.fillStyle = 'rgba(255,225,77,.8)'; g.fillText('TREASURE ROOM  -  TAKE ONE', W / 2, H / 2 - 70); }
-    if (r.type === 'shop') { g.textAlign = 'center'; g.font = 'bold 16px Orbitron, sans-serif'; g.fillStyle = 'rgba(109,255,158,.8)'; g.fillText('SUPPLY SHOP  -  SPEND YOUR COINS', W / 2, H / 2 - 70); }
+    if (r.type === 'shop') { g.textAlign = 'center'; g.font = 'bold 16px Orbitron, sans-serif'; g.fillStyle = 'rgba(109,255,158,.8)'; g.fillText('SALVAGE SHOP  -  SPEND YOUR COINS', W / 2, H / 2 - 70); }
   },
 
   drawHazards(g) {
@@ -153,13 +170,13 @@ const Render = {
           break;
         }
         case 'portal': {
-          g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.8; g.drawImage(FX.glow('#d65bff', 128), k.x - 70, k.y - 70, 140, 140);
+          g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.8; g.drawImage(FX.glow('#4de1ff', 128), k.x - 70, k.y - 70, 140, 140);
           g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
           for (let i = 0; i < 4; i++) {
-            g.strokeStyle = rgba('#d65bff', 0.9 - i * 0.18); g.lineWidth = 3 - i * 0.5;
+            g.strokeStyle = rgba('#4de1ff', 0.9 - i * 0.18); g.lineWidth = 3 - i * 0.5;
             g.beginPath(); g.ellipse(k.x, k.y, 30 - i * 6, 30 - i * 6, t * (1 + i * 0.5), 0.2, TAU - 0.4); g.stroke();
           }
-          g.fillStyle = '#d65bff'; g.font = 'bold 11px Orbitron, sans-serif'; g.textAlign = 'center'; g.fillText('NEXT FLOOR', k.x, k.y - 44);
+          g.fillStyle = '#4de1ff'; g.font = 'bold 11px Orbitron, sans-serif'; g.textAlign = 'center'; g.fillText('NEXT DEPTH', k.x, k.y - 44);
           break;
         }
         case 'ped': {

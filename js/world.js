@@ -180,33 +180,43 @@ function bakeFloor(g, theme) {
   const cols = Math.ceil((ARENA.x2 - ARENA.x1) / T), rows = Math.ceil((ARENA.y2 - ARENA.y1) / T);
   for (let ty = 0; ty < rows; ty++) for (let tx = 0; tx < cols; tx++) {
     const x = ARENA.x1 + tx * T, y = ARENA.y1 + ty * T, edge = tx === 0 || ty === 0 || tx === cols - 1 || ty === rows - 1;
-    g.fillStyle = mixHex(theme.bg, '#ffffff', 0.015 + Math.random() * 0.045); g.fillRect(x, y, T, T);
-    g.fillStyle = 'rgba(255,255,255,.06)'; g.fillRect(x, y, T, 1); g.fillRect(x, y, 1, T);
-    g.fillStyle = 'rgba(0,0,0,.38)'; g.fillRect(x, y + T - 1, T, 1); g.fillRect(x + T - 1, y, 1, T);
+    if (deco === 'reef') g.fillStyle = mixHex(theme.bg, '#d8c590', 0.10 + Math.random() * 0.08);
+    else if (deco === 'wreck') g.fillStyle = mixHex('#33281a', '#000000', Math.random() * 0.28);
+    else g.fillStyle = mixHex(theme.bg, '#ffffff', 0.012 + Math.random() * 0.035);
+    g.fillRect(x, y, T, T);
+    if (deco !== 'wreck') {
+      g.fillStyle = 'rgba(255,255,255,.04)'; g.fillRect(x, y, T, 1); g.fillRect(x, y, 1, T);
+      g.fillStyle = 'rgba(0,0,0,.22)'; g.fillRect(x, y + T - 1, T, 1); g.fillRect(x + T - 1, y, 1, T);
+    }
     for (let i = 0; i < 16; i++) {
-      g.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,.045)' : 'rgba(0,0,0,.28)';
+      g.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.25)';
       g.fillRect(x + randi(2, T - 3), y + randi(2, T - 3), 1 + (Math.random() < 0.2 ? 1 : 0), 1);
     }
-    if (deco === 'forge') {
-      g.fillStyle = rgba(theme.edge, 0.32);
-      if (Math.random() < 0.45) { g.fillRect(x + 3, y + 3, 2, 2); g.fillRect(x + T - 5, y + 3, 2, 2); g.fillRect(x + 3, y + T - 5, 2, 2); g.fillRect(x + T - 5, y + T - 5, 2, 2); }
-      if (Math.random() < 0.07) { for (let k = 0; k < 4; k++) { g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(x + 6, y + 8 + k * 7, T - 12, 3); g.fillStyle = rgba(theme.edge, 0.12); g.fillRect(x + 6, y + 11 + k * 7, T - 12, 1); } }
-      if (edge && Math.random() < 0.5) {
-        for (let k = -T; k < T; k += 10) { g.fillStyle = 'rgba(255,200,40,.2)'; g.beginPath(); g.moveTo(x + k, y + T); g.lineTo(x + k + 5, y + T); g.lineTo(x + k + 11, y + T - 6); g.lineTo(x + k + 6, y + T - 6); g.fill(); }
+    if (deco === 'reef') {
+      g.strokeStyle = 'rgba(255,255,255,.07)'; g.lineWidth = 1;
+      for (let k = 0; k < 2; k++) { const cx = x + randi(6, T - 6), cy = y + randi(6, T - 6); g.beginPath(); g.arc(cx, cy, randi(5, 10), 0.2, 2.2); g.stroke(); }
+      if (Math.random() < 0.08) { const sx = x + randi(8, T - 8), sy = y + randi(8, T - 8); g.fillStyle = '#ff9a5c'; g.fillRect(sx - 1, sy - 3, 2, 7); g.fillRect(sx - 3, sy - 1, 7, 2); g.fillStyle = '#ffd0a8'; g.fillRect(sx, sy, 1, 1); }
+      if (Math.random() < 0.08) { const sx = x + randi(6, T - 8), sy = y + randi(6, T - 8); g.fillStyle = '#ffb3c8'; g.fillRect(sx, sy, 4, 3); g.fillStyle = '#ff7aa8'; g.fillRect(sx + 1, sy + 1, 2, 1); }
+      if (Math.random() < 0.1 || (edge && Math.random() < 0.3)) {
+        const sx = x + randi(4, T - 4), sy = y + T - 2;
+        for (let b = 0; b < 3; b++) { g.fillStyle = b === 1 ? '#3fbf6a' : '#2a8f4e'; for (let k = 0; k < 9 + b * 3; k++) g.fillRect(sx + b * 3 + Math.round(Math.sin(k * 0.6 + b) * 1.5), sy - k, 1, 1); }
       }
-    } else if (deco === 'moss') {
-      if (Math.random() < 0.42) for (let k = randi(2, 5); k > 0; k--) { g.fillStyle = Math.random() < 0.5 ? 'rgba(70,170,90,.22)' : 'rgba(30,90,45,.4)'; g.fillRect(x + randi(0, T - 8), y + randi(0, T - 8), randi(3, 8), randi(2, 5)); }
-      if (Math.random() < 0.35) for (let k = randi(2, 4); k > 0; k--) { const gx = x + randi(2, T - 4), gy = y + randi(6, T - 4); g.fillStyle = 'rgba(110,235,130,.5)'; g.fillRect(gx, gy - 4, 1, 4); g.fillRect(gx + 2, gy - 3, 1, 3); g.fillRect(gx - 2, gy - 3, 1, 3); }
-      if (edge) { g.fillStyle = 'rgba(30,110,50,.35)'; g.fillRect(x, y, T, 4); g.fillRect(x, y, 4, T); }
-      if (Math.random() < 0.05) { g.fillStyle = 'rgba(255,230,120,.7)'; g.fillRect(x + randi(8, 28), y + randi(8, 28), 2, 2); }
+    } else if (deco === 'wreck') {
+      g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(x, y + 19, T, 2); g.fillRect(x, y + T - 1, T, 1);
+      g.fillStyle = 'rgba(255,220,160,.05)'; g.fillRect(x, y, T, 1); g.fillRect(x, y + 20, T, 1);
+      const sx = randi(0, 1) ? 14 : 26, sx2 = randi(0, 1) ? 8 : 30;
+      g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(x + sx, y, 1, 19); g.fillRect(x + sx2, y + 21, 1, 19);
+      g.fillStyle = 'rgba(180,170,150,.5)'; for (const nx of [3, T - 5]) { g.fillRect(x + nx, y + 4, 2, 2); g.fillRect(x + nx, y + 26, 2, 2); }
+      if (Math.random() < 0.12) { g.fillStyle = 'rgba(160,70,30,.3)'; g.fillRect(x + randi(2, 26), y + randi(2, 26), randi(6, 12), randi(4, 8)); }
+      if (Math.random() < 0.1) { g.fillStyle = 'rgba(60,150,90,.35)'; g.fillRect(x + randi(2, 30), y + randi(2, 30), randi(4, 9), randi(2, 5)); }
     } else {
-      if (Math.random() < 0.13) {
+      if (Math.random() < 0.14) {
         let cx = x + randi(6, T - 6), cy = y + randi(6, T - 6);
-        g.strokeStyle = rgba(theme.edge, 0.5); g.lineWidth = 1; g.beginPath(); g.moveTo(cx, cy);
+        g.strokeStyle = rgba(theme.edge, 0.55); g.lineWidth = 1; g.beginPath(); g.moveTo(cx, cy);
         for (let k = 0; k < randi(4, 8); k++) { cx += randi(-8, 8); cy += randi(-8, 8); g.lineTo(cx, cy); }
         g.stroke();
       }
-      if (Math.random() < 0.1) { g.fillStyle = rgba(theme.edge, 0.55); g.fillRect(x + randi(4, T - 6), y + randi(4, T - 6), 2, 2); }
+      if (Math.random() < 0.12) { const c = Math.random() < 0.5 ? '#4de1ff' : '#ff5de1'; g.fillStyle = rgba(c, 0.7); g.fillRect(x + randi(4, T - 6), y + randi(4, T - 6), 2, 2); }
     }
   }
   g.restore();
@@ -214,26 +224,43 @@ function bakeFloor(g, theme) {
 
 function drawObstacle(g, o, theme) {
   const e = theme.edge, d = theme.deco;
-  g.fillStyle = 'rgba(0,0,0,.5)'; g.fillRect(o.x + 6, o.y + 9, o.w, o.h);
-  brickFill(g, o.x, o.y, o.w, o.h, d === 'forge' ? '#2a3a52' : d === 'moss' ? '#2a3d2c' : '#2e1a4a');
-  g.fillStyle = 'rgba(255,255,255,.13)'; g.fillRect(o.x, o.y, o.w, Math.min(9, Math.floor(o.h / 2)));
-  g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(o.x, o.y + o.h - 5, o.w, 5);
-  if (d === 'forge') {
-    g.strokeStyle = 'rgba(0,0,0,.55)'; g.lineWidth = 3;
-    if (o.w > 40 && o.h > 40) { g.beginPath(); g.moveTo(o.x + 4, o.y + 10); g.lineTo(o.x + o.w - 4, o.y + o.h - 4); g.moveTo(o.x + o.w - 4, o.y + 10); g.lineTo(o.x + 4, o.y + o.h - 4); g.stroke(); }
-    g.fillStyle = rgba(e, 0.7);
-    for (const [px, py] of [[3, 3], [o.w - 6, 3], [3, o.h - 6], [o.w - 6, o.h - 6]]) g.fillRect(o.x + px, o.y + py, 3, 3);
-  } else if (d === 'moss') {
-    for (let i = 0; i < Math.max(4, o.w / 8); i++) { g.fillStyle = Math.random() < 0.5 ? '#3e8c4a' : '#5cc26a'; g.fillRect(o.x + randi(0, o.w - 6), o.y + randi(0, 5), randi(3, 9), randi(2, 4)); }
-    for (let i = 0; i < 3; i++) { g.fillStyle = '#2f7a3c'; g.fillRect(o.x + randi(0, o.w - 2), o.y + randi(6, o.h - 8), 2, randi(6, 14)); }
+  g.fillStyle = 'rgba(0,0,0,.4)'; g.fillRect(o.x + 6, o.y + 9, o.w, o.h);
+  if (d === 'wreck') {
+    g.fillStyle = '#5a4228'; g.fillRect(o.x, o.y, o.w, o.h);
+    for (let yy = o.y + 10; yy < o.y + o.h; yy += 10) { g.fillStyle = 'rgba(0,0,0,.4)'; g.fillRect(o.x, yy, o.w, 1); }
+    for (let i = 0; i < 6; i++) { g.fillStyle = Math.random() < 0.5 ? 'rgba(255,220,160,.1)' : 'rgba(0,0,0,.14)'; g.fillRect(o.x + randi(0, o.w - 8), o.y + randi(0, o.h - 4), randi(4, 14), 2); }
+    g.fillStyle = '#2b2b33';
+    const horiz = o.w >= o.h;
+    for (const k of [0.15, 0.85]) {
+      if (horiz) g.fillRect(o.x + o.w * k - 3, o.y, 6, o.h); else g.fillRect(o.x, o.y + o.h * k - 3, o.w, 6);
+    }
+    g.fillStyle = '#8a8a98'; for (const k of [0.15, 0.85]) { for (const q of [0.2, 0.8]) { if (horiz) g.fillRect(o.x + o.w * k - 1, o.y + o.h * q, 2, 2); else g.fillRect(o.x + o.w * q, o.y + o.h * k - 1, 2, 2); } }
+    g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(o.x, o.y, o.w, 3);
+    g.fillStyle = 'rgba(60,150,90,.5)'; for (let i = 0; i < 4; i++) g.fillRect(o.x + randi(0, o.w - 6), o.y + o.h - randi(2, 6), randi(3, 8), 3);
+  } else if (d === 'reef') {
+    brickFill(g, o.x, o.y, o.w, o.h, '#2f6a78');
+    g.fillStyle = 'rgba(255,255,255,.14)'; g.fillRect(o.x, o.y, o.w, Math.min(8, Math.floor(o.h / 2)));
+    const n = Math.max(3, Math.round(o.w / 14));
+    for (let i = 0; i < n; i++) {
+      const bx = o.x + 6 + i * (o.w - 12) / Math.max(1, n - 1), col = ['#ff7aa8', '#ff9f5a', '#ffb3c8', '#ff6b6b'][i % 4];
+      g.strokeStyle = col; g.lineCap = 'round';
+      for (let k = 0; k < 3; k++) {
+        const ang = -Math.PI / 2 + (k - 1) * 0.5, len = randi(10, 20);
+        g.lineWidth = 3; g.beginPath(); g.moveTo(bx, o.y + 3); g.lineTo(bx + Math.cos(ang) * len, o.y + 3 + Math.sin(ang) * len); g.stroke();
+        g.fillStyle = '#fff2e8'; g.fillRect(bx + Math.cos(ang) * len - 1, o.y + 3 + Math.sin(ang) * len - 1, 3, 3);
+      }
+    }
+    g.lineCap = 'butt';
   } else {
+    brickFill(g, o.x, o.y, o.w, o.h, '#1c1a44');
+    g.fillStyle = 'rgba(255,255,255,.08)'; g.fillRect(o.x, o.y, o.w, Math.min(8, Math.floor(o.h / 2)));
     for (let i = 0; i < Math.max(2, o.w / 30); i++) {
       const bx = o.x + 8 + i * (o.w - 16) / Math.max(1, Math.floor(o.w / 30)), hh = randi(14, 26);
-      const gr = g.createLinearGradient(0, o.y - hh, 0, o.y); gr.addColorStop(0, '#e9a6ff'); gr.addColorStop(1, '#7a2fc4');
+      const gr = g.createLinearGradient(0, o.y - hh, 0, o.y); gr.addColorStop(0, '#8ffcff'); gr.addColorStop(1, '#3a6bd8');
       g.fillStyle = gr; g.beginPath(); g.moveTo(bx - 6, o.y + 2); g.lineTo(bx, o.y - hh); g.lineTo(bx + 6, o.y + 2); g.fill();
-      g.fillStyle = 'rgba(255,255,255,.35)'; g.beginPath(); g.moveTo(bx, o.y - hh); g.lineTo(bx + 2, o.y - hh * 0.4); g.lineTo(bx - 2, o.y - hh * 0.4); g.fill();
+      g.fillStyle = 'rgba(255,255,255,.4)'; g.beginPath(); g.moveTo(bx, o.y - hh); g.lineTo(bx + 2, o.y - hh * 0.4); g.lineTo(bx - 2, o.y - hh * 0.4); g.fill();
     }
   }
-  g.strokeStyle = e; g.lineWidth = 2; g.shadowColor = e; g.shadowBlur = 8;
+  g.strokeStyle = rgba(e, 0.7); g.lineWidth = 2; g.shadowColor = e; g.shadowBlur = 6;
   g.strokeRect(o.x + 1, o.y + 1, o.w - 2, o.h - 2); g.shadowBlur = 0;
 }

@@ -166,32 +166,30 @@ const Sprites = {
 
   init() {
     if (this.ready) return; this.ready = true;
-    const OUT = '#0b0714';
+    const OUT = '#050b18';
 
-    /* ---------------- PLAYER: space marine ---------------- */
+    /* ---------------- PLAYER: yellow submarine (faces right) ---------------- */
     {
-      const P = new Px(18, 24); P.sym = true;
-      const armor = ramp('#d4e6ff'), navy = ramp('#34588f'), orange = ramp('#ff9f43'), visor = ramp('#38e1ff'), dark = ramp('#2a3350');
-      P.shadedRect(2, 10, 14, 8, dark, true);               // backpack
-      P.shadedRect(4, 17, 4, 5, navy);                       // legs
-      P.shadedRect(3, 21, 5, 3, dark, true);                 // boots
-      P.shadedRect(4, 11, 10, 7, armor, true);               // torso
-      P.rect(4, 16, 10, 1, orange[1]);                       // belt
-      P.set(8, 16, orange[3]);
-      P.rect(8, 12, 2, 3, visor[2]); P.set(8, 12, visor[3]); // chest light
-      P.ellipse(4.2, 12.5, 3, 3, orange);                    // shoulder pads
-      P.shadedRect(0, 13, 3, 6, armor, true);                // arms
-      P.rect(0, 18, 3, 2, dark[1]);                          // gloves
-      P.ellipse(9, 7, 6.2, 6.2, armor);                      // helmet
-      P.ellipse(9, 7.6, 4.4, 3.3, visor);                    // visor
-      P.sym = false;
-      P.set(6, 6, '#ffffff'); P.set(7, 5, '#eaffff'); P.set(6, 7, '#aaf4ff');
-      P.rect(14, 0, 1, 3, orange[2]); P.set(14, 0, '#ff5d6c');   // antenna
-      P.outline(OUT);
-      this.def('player', P, 0.55);
+      const P = new Px(32, 20);
+      const hull = ramp('#ffd23f'), dk = ramp('#c98a12'), steel = ramp('#8a97ab'), glass = ramp('#7df9ff');
+      P.poly([[3, 3], [10, 8], [3, 10]], dk);                  // rear top fin
+      P.poly([[3, 12], [10, 12], [3, 18]], dk);                // rear bottom fin
+      P.shadedRect(0, 7, 3, 7, steel, true);                   // propeller hub
+      P.rect(0, 5, 1, 2, steel[3]); P.rect(0, 14, 1, 2, steel[3]);
+      P.ellipse(17, 11.5, 13.5, 6.2, hull);                    // hull
+      P.paint((x, y) => (y === 13 || y === 14) && x > 4 && x < 29 ? dk[2] : null); // stripe
+      P.shadedRect(12, 3, 9, 5, hull, true);                   // conning tower
+      P.rect(16, 0, 1, 3, steel[2]); P.rect(17, 0, 4, 1, steel[2]); P.set(20, 1, '#ff5d6c');   // periscope
+      for (const x of [11, 17, 23]) {                          // portholes
+        P.ellipse(x, 11, 2.4, 2.4, null, '#243b5a');
+        P.ellipse(x, 11, 1.7, 1.7, null, glass[2]); P.set(x - 1, 10, '#ffffff');
+      }
+      P.ellipse(29.5, 11.5, 2.4, 3, glass);                    // nose window
+      P.set(28, 10, '#ffffff');
+      P.outline(OUT); this.def('player', P, 0.5);
     }
 
-    /* guns (drawn rotated around the grip at x=3) */
+    /* guns: deck cannons mounted on top of the sub (drawn rotated around the grip) */
     {
       const metal = ramp('#7d8aa8'), dk = ramp('#3a4258');
       const gun = (name, len, h, col, extra) => {
@@ -207,160 +205,154 @@ const Sprites = {
       gun('gun_smg', 15, 3, '#a5ff7d', (P) => { P.shadedRect(5, 3, 3, 5, dk); P.shadedRect(1, 3, 3, 3, dk); });
       gun('gun_shotgun', 19, 4, '#ffb347', (P, len) => { P.shadedRect(2, 4, 4, 3, dk); P.rect(len - 12, 1, 8, 1, '#caa77a'); });
       gun('gun_rail', 21, 4, '#fff27d', (P, len, h, col) => { P.rect(5, 0, len - 10, 1, col); P.rect(5, h + 1, len - 10, 1, col); P.shadedRect(2, 4, 3, 3, dk); });
-      gun('gun_launcher', 19, 5, '#ff7a3d', (P, len, h, col) => { P.ellipse(len - 2, 3.5, 3, 3, ramp('#ff7a3d')); P.shadedRect(3, 5, 3, 3, dk); });
+      gun('gun_launcher', 19, 5, '#ff7a3d', (P, len) => { P.ellipse(len - 2, 3.5, 3, 3, ramp('#ff7a3d')); P.shadedRect(3, 5, 3, 3, dk); });
     }
 
     /* ---------------- ENEMIES ---------------- */
-    { // GRUNT - snarling red crawler
-      const P = new Px(16, 16); P.sym = true; const r = ramp('#ff5d6c'), bone = ramp('#efe3cc');
-      P.ellipse(2.5, 11, 2.2, 3.4, r);                       // claws
-      P.set(1, 14, bone[3]); P.set(0, 13, bone[3]);
-      P.ellipse(8, 9.6, 6.7, 5.8, r);                        // body
-      P.rect(3, 2, 1, 4, bone[2]); P.set(3, 1, bone[3]);     // horns
-      P.rect(4, 5, 1, 1, bone[1]);
-      P.eye(3, 6);
-      P.rect(4, 5, 3, 1, r[0]); P.set(7, 6, r[0]);           // angry brows
-      P.rect(5, 11, 6, 3, '#2a0610');                        // mouth
-      P.set(5, 11, '#fff'); P.set(7, 11, '#fff'); P.set(6, 13, '#fff');
+    { // GRUNT - piranha (faces right)
+      const P = new Px(24, 18), r = ramp('#ff5d6c'), dk = ramp('#a01e36');
+      P.poly([[0, 3], [7, 9], [0, 15]], dk);                   // tail
+      P.poly([[9, 2], [15, 3], [17, 6]], dk);                  // dorsal fin
+      P.poly([[11, 14], [15, 14], [12, 18]], dk);              // belly fin
+      P.ellipse(14, 9.5, 9.5, 6.5, r);
+      P.ellipse(14, 12.5, 7.5, 3, null, '#ffb0a8');            // belly
+      P.line(13, 3, 19, 6, dk[0]);                             // angry brow
+      P.rect(19, 10, 5, 3, '#2a0610');                         // mouth
+      for (const x of [19, 21, 23]) P.set(x, 10, '#fff'); for (const x of [20, 22]) P.set(x, 12, '#fff');
+      P.eye(15, 5);
       P.outline(OUT); this.def('grunt', P);
     }
-    { // SWARMER - little glowing bug
-      const P = new Px(12, 11); P.sym = true; const r = ramp('#ffb347');
-      P.ellipse(1.8, 4.5, 1.8, 3, null, 'rgba(255,240,200,.75)'); // wings
-      P.ellipse(6, 6.5, 3.8, 3.5, r);
-      P.line(4, 3, 3, 0, r[1]); P.set(3, 0, r[3]);           // antennae
-      P.eye(2, 5);
-      P.rect(5, 9, 2, 1, r[0]);
+    { // SWARMER - minnow
+      const P = new Px(14, 9), r = ramp('#ffb347');
+      P.poly([[0, 0], [5, 4], [0, 8]], ramp('#d9822b'));
+      P.ellipse(9, 4.5, 5, 3.6, r);
+      P.set(10, 3, '#fff'); P.set(11, 3, '#fff'); P.set(10, 4, '#fff'); P.set(11, 4, '#fff'); P.eyes.push({ x: 11, y: 4, s: 1 });
       P.outline(OUT); this.def('swarmer', P);
     }
-    { // SHOOTER - floating one-eyed drone
-      const P = new Px(18, 18); P.sym = true; const r = ramp('#ff7bd5'), steel = ramp('#7d6a9a');
-      P.shadedRect(0, 7, 4, 5, steel, true);                 // side fins
-      P.rect(1, 6, 1, 1, steel[3]);
-      P.ellipse(9, 9, 7, 7, r);                              // body
-      P.rect(3, 9, 12, 1, r[0]);                             // panel seam
-      P.sym = false; P.bigEye(9, 8, 4.5, 4.5, 3); P.sym = true;
-      P.rect(8, 15, 2, 2, steel[1]);                         // nozzle
-      P.set(4, 3, r[3]); P.set(5, 2, r[3]);
+    { // SHOOTER - squid
+      const P = new Px(20, 24); P.sym = true; const r = ramp('#ff7bd5'), dk = ramp('#b83a9a');
+      P.poly([[2, 9], [6, 4], [7, 12]], dk);                   // fins
+      P.ellipse(10, 8.5, 5.2, 7.8, r);                         // mantle
+      P.ellipse(10, 14, 6.2, 4.2, r);                          // head
+      for (const [x, len] of [[5, 7], [7.5, 8], [9.5, 6]]) { P.line(x, 17, x - 1, 17 + len - 2, r[1], 1); P.set(x - 1, 17 + len - 1, r[3]); }
+      P.eye(3, 12);
+      P.set(9, 3, r[3]); P.set(9, 4, r[3]); P.set(10, 5, r[3]);
       P.outline(OUT); this.def('shooter', P);
     }
-    { // DASHER - sleek yellow raptor
-      const P = new Px(18, 18); P.sym = true; const r = ramp('#ffe14d'), dk = ramp('#9a7a14');
-      P.poly([[0, 7], [5, 9], [4, 14], [1, 12]], dk);        // blade wings
-      P.ellipse(9, 10, 5.6, 6.4, r);
-      P.poly([[9, 0], [11, 5], [9, 6.5], [7, 5]], null, dk[1]); // crest (centre)
-      P.poly([[6, 3], [8, 6], [5, 7]], dk);
-      P.eye(4, 8);
-      P.line(3, 7, 7, 9, dk[0], 1);                          // slanted brow
-      P.rect(7, 13, 4, 2, dk[0]); P.set(8, 13, '#fff');
+    { // DASHER - swordfish (faces right)
+      const P = new Px(30, 14), r = ramp('#ffe14d'), bl = ramp('#4d8aff');
+      P.poly([[0, 0], [7, 7], [0, 14]], bl);                   // tail
+      P.poly([[10, 0], [17, 1], [17, 5]], bl);                 // dorsal
+      P.ellipse(15, 7.5, 9.5, 5.2, r);
+      P.ellipse(15, 10, 7.5, 2.4, null, '#fff3b0');
+      P.rect(23, 7, 7, 1, '#d8ecff'); P.set(29, 7, '#ffffff');  // sword
+      P.eye(17, 4);
       P.outline(OUT); this.def('dasher', P);
     }
-    { // BOMBER - cartoon bomb with fuse
-      const P = new Px(18, 20); P.sym = false; const r = ramp('#ff8a3d'), steel = ramp('#8892a8');
-      P.ellipse(9, 12, 7.5, 7.5, r);
-      P.shadedRect(6, 3, 6, 3, steel);                       // cap
-      P.rect(8, 2, 2, 1, steel[3]);
-      P.line(9, 2, 10, 1, '#8a6a3a'); P.line(10, 1, 12, 1, '#8a6a3a'); P.set(13, 0, '#8a6a3a');
-      P.sym = true; P.eye(4, 9);
-      P.sym = false;
-      for (let i = 0; i < 6; i++) P.set(5 + i * 1.2, i % 2 ? 16 : 15, '#2a0f06');   // stitched grin
-      P.set(5, 14, r[0]); P.set(12, 14, r[0]);
+    { // BOMBER - pufferfish
+      const P = new Px(24, 24); P.sym = true; const r = ramp('#ff8a3d');
+      P.poly([[1, 10], [5, 8], [5, 17], [1, 15]], ramp('#c9591a'));
+      P.ellipse(12, 12.5, 8.4, 8.4, r);
+      for (let i = 0; i < 14; i++) {
+        const a = i / 14 * TAU, x1 = 12 + Math.cos(a) * 8.2, y1 = 12.5 + Math.sin(a) * 8.2, x2 = 12 + Math.cos(a) * 11, y2 = 12.5 + Math.sin(a) * 11;
+        P.line(x1, y1, x2, y2, '#ffe9b8', 1);
+      }
+      P.ellipse(12, 16.5, 5.2, 3, null, '#ffd9ae');
+      P.eye(5, 8);
+      P.rect(10, 15, 4, 2, '#3a1206');
       P.outline(OUT); this.def('bomber', P);
     }
-    { // TANK - armoured brute
-      const P = new Px(28, 28); P.sym = true; const steel = ramp('#8aa0ff'), dk = ramp('#3a4a8a'), gy = ramp('#9aa4b8');
-      P.shadedRect(2, 20, 8, 7, dk, true);                   // treads
-      P.rect(3, 22, 6, 1, dk[0]); P.rect(3, 24, 6, 1, dk[0]);
-      P.shadedRect(4, 9, 20, 14, steel, true);               // torso
-      P.rect(7, 12, 14, 1, steel[3]);
-      P.poly([[9, 14], [19, 14], [14, 21]], null, dk[1]);    // chest plate
-      P.set(14, 16, '#ffe14d'); P.set(13, 16, '#ffe14d');
-      P.shadedRect(0, 10, 5, 9, gy, true);                   // shoulder cannons
-      P.rect(0, 17, 5, 3, '#222a40'); P.set(2, 19, '#ff7bd5');
-      P.ellipse(14, 7, 5.5, 4.5, steel);                     // head
-      P.rect(9, 6, 10, 2, '#ff4d6d'); P.set(10, 6, '#ffc0c8'); // visor
-      P.rect(4, 10, 1, 1, '#fff'); P.rect(23, 10, 1, 1, '#fff'); P.rect(4, 21, 1, 1, '#fff'); P.rect(23, 21, 1, 1, '#fff');
+    { // TANK - armoured crab
+      const P = new Px(34, 26); P.sym = true; const r = ramp('#ff7a5c'), dk = ramp('#b3382a');
+      for (let i = 0; i < 3; i++) { P.line(9 + i, 16 + i, 4 - i, 19 + i * 1, dk[1], 1); P.line(4 - i, 19 + i, 3 - i, 24, dk[0], 1); }
+      P.ellipse(17, 15, 11.5, 7.5, r);                         // shell
+      for (const [x, y] of [[11, 12], [14, 10], [20, 10], [22, 13], [17, 14]]) P.set(x, y, r[3]);
+      P.line(7, 13, 5, 9, r[1], 3);                            // arm
+      P.ellipse(5, 6.5, 4.6, 5, r);                            // claw
+      P.rect(4, 0, 2, 4, null); P.ellipse(3, 10, 2.2, 1.6, dk);
+      P.line(13, 8, 13, 5, dk[1], 1); P.eye(11, 2);            // eye stalks
+      P.rect(14, 18, 6, 1, dk[0]);
       P.outline(OUT); this.def('tank', P);
     }
-    { // TURRET (static base; barrels are drawn rotating at run-time)
-      const P = new Px(22, 20); P.sym = true; const pu = ramp('#c77dff'), gy = ramp('#6a6a88');
-      P.ellipse(11, 14, 10, 5, gy);
-      P.rect(4, 14, 14, 1, gy[0]);
-      P.ellipse(11, 9.5, 7, 7, pu);
-      P.ellipse(11, 9.5, 4, 4, null, '#1b0a2e');
-      P.ellipse(11, 9.5, 2.4, 2.4, null, '#ff7bd5'); P.set(10, 8, '#fff');
+    { // TURRET - sea urchin (long spines are drawn rotating at run-time)
+      const P = new Px(26, 26); P.sym = true; const pu = ramp('#c77dff'), dk = ramp('#5a2a8a');
+      for (let i = 0; i < 22; i++) {
+        const a = i / 22 * TAU;
+        P.line(13 + Math.cos(a) * 6, 13 + Math.sin(a) * 6, 13 + Math.cos(a) * 11.5, 13 + Math.sin(a) * 11.5, dk[2], 1);
+        P.set(13 + Math.cos(a) * 11.5, 13 + Math.sin(a) * 11.5, pu[3]);
+      }
+      P.ellipse(13, 13, 7, 7, dk);
+      P.ellipse(13, 13, 4.6, 4.6, pu);
+      P.bigEye(13, 13, 3, 3, 2, '#ffffff');
       P.outline(OUT); this.def('turret', P, 0.5);
-      const B = new Px(12, 5); B.shadedRect(0, 0, 9, 5, gy); B.shadedRect(8, 1, 4, 3, ramp('#c77dff')); B.outline(OUT);
+      const B = new Px(14, 5); B.shadedRect(0, 1, 9, 3, dk); B.poly([[8, 0], [14, 2.5], [8, 5]], pu); B.outline(OUT);
       this.def('turret_barrel', B, 0.5);
     }
-    { // SPAWNER (hive) - pulsing egg sac
-      const P = new Px(26, 26); P.sym = true; const g1 = ramp('#6dff9e'), dk = ramp('#2a8a52');
-      P.line(5, 22, 2, 25, dk[1]); P.line(9, 23, 7, 25, dk[1]);
-      P.ellipse(13, 13, 11, 11.5, g1);
-      P.ellipse(6.5, 9, 2.2, 2.6, null, dk[0]); P.ellipse(6, 16.5, 1.8, 2.2, null, dk[0]); P.ellipse(9.5, 20, 1.5, 1.7, null, dk[0]);
-      P.ellipse(6.5, 8.5, 1.2, 1.4, null, g1[3]);
-      P.sym = false;
-      P.bigEye(13, 12, 5, 5.5, 3, '#fff7c2');
-      P.sym = true;
-      P.line(13, 2, 13, 5, g1[3]);
+    { // SPAWNER - giant clam
+      const P = new Px(30, 24); P.sym = true; const g1 = ramp('#6dff9e'), dk = ramp('#2a8a52');
+      P.ellipse(15, 16, 13, 6.5, dk);
+      P.ellipse(15, 13.5, 11, 4.4, null, '#14281c');
+      P.sym = false; P.bigEye(15, 12.5, 4.4, 4, 3, '#fff4c2'); P.sym = true;
+      P.ellipse(15, 7, 13, 6.5, g1);
+      P.paint((x, y) => { if (y > 12) return null; const k = Math.floor(Math.atan2(x - 14.5, 13 - y) * 6); return (k % 2 === 0) ? dk[2] : null; });
+      for (let i = 0; i < 6; i++) { P.set(7 + i * 3, 13, '#fff'); P.set(7 + i * 3, 14, '#fff'); }
       P.outline(OUT); this.def('spawner', P);
     }
 
     /* ---------------- BOSSES ---------------- */
-    { // THE WARDEN - horned iron golem
-      const P = new Px(38, 40); P.sym = true;
-      const steel = ramp('#9a4a58'), dk = ramp('#3c2430'), hot = ramp('#ff5d4d'), bone = ramp('#efe3cc');
-      P.shadedRect(9, 29, 8, 9, dk, true); P.shadedRect(7, 36, 10, 4, steel, true);        // legs/feet
-      P.shadedRect(2, 17, 7, 14, steel, true);                                               // arms
-      P.shadedRect(1, 29, 8, 7, dk, true); P.rect(2, 33, 6, 1, dk[0]);                       // fists
-      P.shadedRect(9, 14, 20, 17, steel, true);                                              // torso
-      P.rect(10, 22, 18, 2, dk[1]);                                                          // belt
-      P.ellipse(19, 21, 4.2, 4.2, hot);                                                      // chest core
-      P.ellipse(19, 21, 2.2, 2.2, null, '#ffe9a0');
-      P.ellipse(7, 16, 6.2, 5.2, steel);                                                     // pauldrons
-      P.set(3, 13, dk[0]); P.rect(5, 9, 2, 5, bone[2]); P.set(5, 8, bone[3]); P.set(6, 8, bone[3]);   // shoulder spikes
-      P.ellipse(19, 9, 7.6, 7.2, steel);                                                     // helmet
-      P.rect(12, 8, 14, 3, '#0b0714');                                                       // visor slit
-      P.sym = false;
-      P.rect(13, 9, 5, 1, '#ff3030'); P.rect(20, 9, 5, 1, '#ff3030'); P.set(14, 9, '#ffd0a0'); P.set(21, 9, '#ffd0a0');
-      P.sym = true;
-      P.poly([[10, 5], [5, 3], [3, -1], [8, 2], [11, 3]], null, bone[2]);                    // horns
-      P.line(9, 4, 4, 0, bone[3], 1);
-      P.rect(15, 12, 8, 2, dk[1]);                                                           // grille
+    { // KING CRAB
+      const P = new Px(52, 42); P.sym = true;
+      const r = ramp('#e8553d'), dk = ramp('#8f2a1f'), bone = ramp('#f2e6cc');
+      for (let i = 0; i < 4; i++) { P.line(14, 24 + i * 2, 7 - i, 28 + i * 3, dk[1], 2); P.line(7 - i, 28 + i * 3, 5 - i, 40, dk[0], 2); }
+      P.ellipse(26, 25, 16.5, 11.5, r);                        // shell
+      P.paint((x, y, c) => (y % 6 === 0 && y > 17 && y < 33 && Math.abs(x - 26) < 14) ? dk[2] : null);
+      for (const [x, y] of [[18, 22], [22, 19], [30, 19], [34, 22], [26, 27], [20, 28], [32, 28]]) P.set(x, y, r[3]);
+      for (let k = -2; k <= 2; k++) P.poly([[26 + k * 5 - 2, 15], [26 + k * 5, 9], [26 + k * 5 + 2, 15]], bone);
+      P.line(12, 19, 8, 13, r[1], 4);                          // arm
+      P.ellipse(7, 9, 6.6, 6.6, r); P.rect(5, 0, 3, 7, null); P.ellipse(3.6, 14.4, 3.2, 2.6, dk);
+      P.line(19, 14, 19, 8, dk[1], 2); P.eye(18, 3);           // eye stalks
+      P.rect(22, 31, 8, 2, dk[0]); P.set(23, 33, bone[3]); P.set(28, 33, bone[3]);
       P.outline(OUT); this.def('boss_warden', P, 0.5);
     }
-    { // HIVE MOTHER - winged insect queen
-      const P = new Px(44, 44); P.sym = true;
-      const g1 = ramp('#58d68a'), dk = ramp('#1f7a45'), bone = ramp('#efe3cc'), gold = ramp('#ffd24d');
-      P.ellipse(5, 14, 5.5, 10, null, 'rgba(190,255,215,.42)'); P.ellipse(6, 13, 3.2, 7, null, 'rgba(255,255,255,.28)'); // wings
-      for (let i = 0; i < 3; i++) { P.line(10 - i * 2, 28 + i * 3, 2 - i, 36 + i * 3, dk[1], 1); P.line(2 - i, 36 + i * 3, 3 - i, 40 + i * 2, dk[0], 1); } // legs
-      P.ellipse(22, 29, 14, 12.5, g1);                                                       // abdomen
-      P.paint((x, y, c) => (y >= 22 && y <= 39 && (y - 22) % 5 === 0) ? dk[1] : null);       // segments
-      for (let i = 0; i < 3; i++) P.ellipse(13 + i * 1.6, 27 + i * 4, 2.2, 2.2, null, gold[2 - (i % 2)]); // glowing pustules
-      P.ellipse(22, 14, 9, 8.5, ramp('#7be8a2'));                                            // head
-      P.poly([[13, 9], [10, 3], [14, 6]], null, gold[2]); P.poly([[16, 7], [15, 0], [18, 5]], null, gold[3]); // crown spikes
-      P.eye(14, 9); P.rect(15, 8, 4, 1, dk[0]);                                              // main eyes
-      P.ellipse(19.5, 15.5, 1.4, 1.4, null, '#ffd24d');                                      // small eyes
-      P.line(18, 20, 14, 26, bone[2], 2); P.line(14, 26, 17, 28, bone[3], 1);               // mandibles
+    { // THE ANGLER - deep sea anglerfish
+      const P = new Px(52, 46); P.sym = true;
+      const b = ramp('#3a7fa8'), dk = ramp('#16405a');
+      P.poly([[1, 26], [12, 16], [12, 34]], dk);               // side fins
+      for (let k = 0; k < 5; k++) P.poly([[10 + k * 4, 14 - (k % 2) * 2], [13 + k * 4, 6 + k % 2 * 2], [15 + k * 4, 15]], dk);   // back spikes
+      P.ellipse(26, 27, 19.5, 16.5, b);
+      for (const [x, y] of [[14, 20], [18, 16], [12, 26], [22, 14], [16, 32]]) { P.set(x, y, b[3]); P.set(x + 1, y, b[3]); }
+      P.ellipse(26, 32, 15.5, 8.5, null, '#1a0a14');           // mouth
+      for (let i = 0; i < 9; i++) {
+        const x = 12 + i * 3.4;
+        P.poly([[x, 25], [x + 1.8, 25], [x + 0.9, 30]], null, '#f4f7ff');
+        P.poly([[x, 39], [x + 1.8, 39], [x + 0.9, 34]], null, '#f4f7ff');
+      }
+      P.sym = false; P.bigEye(14, 19, 4.2, 4.2, 2, '#fff7c2'); P.bigEye(38, 19, 4.2, 4.2, 2, '#fff7c2');
+      P.line(26, 12, 26, 5, dk[1], 2); P.line(26, 5, 31, 3, dk[1], 1);     // lure stalk
+      P.ellipse(32, 3, 3.2, 3.2, ramp('#ffe14d')); P.set(31, 2, '#ffffff');
+      P.sym = true;
       P.outline(OUT); this.def('boss_hive', P, 0.5);
     }
-    { // THE VOID CORE - crystal eye
-      const P = new Px(48, 48); P.sym = true;
-      const cr = ramp('#b84dff'), dk = ramp('#4a1b88'), glow = ramp('#ff8bf0');
-      P.poly([[24, 0], [30, 9], [24, 14], [18, 9]], cr);                                     // top shard
-      P.poly([[24, 48], [30, 39], [24, 34], [18, 39]], cr);                                  // bottom shard
-      P.poly([[0, 24], [9, 18], [14, 24], [9, 30]], cr);                                     // side shards
-      P.poly([[6, 6], [13, 9], [14, 14], [8, 13]], dk); P.poly([[6, 42], [13, 39], [14, 34], [8, 35]], dk);
-      P.ellipse(24, 24, 13, 13.5, dk);                                                       // core
-      P.ellipse(24, 24, 11, 11.5, cr);
-      for (let a = 0; a < 16; a++) {                                                         // rune ring
-        const an = a / 16 * TAU; P.set(24 + Math.cos(an) * 12.2, 24 + Math.sin(an) * 12.7, a % 2 ? glow[3] : glow[1]);
-      }
-      P.sym = false; P.bigEye(24, 24, 8.5, 7.5, 5, '#fff2ff'); P.sym = true;
-      P.sym = false; P.ellipse(24, 24, 4.2, 4.2, null, '#7a1fc4'); P.eyes.length = 0; P.eyes.push({ x: 22, y: 22, s: 5 });
-      P.ellipse(24, 24, 2.4, 2.4, null, '#1a0630'); P.sym = true;
+    { // THE KRAKEN - giant tentacled eye
+      const P = new Px(60, 56); P.sym = true;
+      const b = ramp('#9a5dff'), dk = ramp('#4a1f8a'), suck = ramp('#e0c4ff');
+      const tent = pts => {
+        for (let i = 0; i + 1 < pts.length; i++) { const t = Math.max(1, 4 - i); P.line(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], dk[2], t); }
+        for (let i = 0; i + 1 < pts.length; i++) P.line(pts[i][0] + 1, pts[i][1], pts[i + 1][0] + 1, pts[i + 1][1], b[2], 1);
+        for (const p of pts) P.set(p[0] - 1, p[1] + 1, suck[3]);
+      };
+      tent([[16, 26], [9, 34], [7, 44], [11, 51], [16, 52]]);
+      tent([[20, 30], [15, 40], [15, 49], [21, 54]]);
+      tent([[24, 32], [23, 42], [27, 50]]);
+      tent([[10, 18], [3, 27], [2, 38], [5, 46]]);
+      P.ellipse(30, 21, 18.5, 17, b);                          // head
+      for (const [x, y] of [[16, 12], [20, 8], [14, 20], [22, 14], [12, 26]]) { P.set(x, y, b[3]); P.set(x + 1, y + 1, b[3]); }
+      for (let k = 0; k < 4; k++) P.poly([[17 + k * 4, 8 - k], [19 + k * 4, 0 + (k === 3 ? 4 : 0)], [22 + k * 4, 7 - k]], dk);   // crown
+      P.bigEye(30, 24, 10, 7.5, 5, '#fff6c8');
+      P.ellipse(30, 24, 5.6, 5.2, null, '#7a2fe0');
+      P.ellipse(30, 24, 2.4, 2.4, null, '#7a2fe0');
       P.outline(OUT); this.def('boss_core', P, 0.5);
-      const S = new Px(8, 12); S.sym = true; S.poly([[4, 0], [8, 6], [4, 12], [0, 6]], cr); S.outline(OUT);
+      const S = new Px(9, 9); S.ellipse(4.5, 4.5, 3.8, 3.8, ramp('#e8d4ff')); S.set(3, 3, '#ffffff'); S.outline(OUT);
       this.def('shard', S, 0.5);
     }
 

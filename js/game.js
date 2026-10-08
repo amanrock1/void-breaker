@@ -331,7 +331,7 @@ const G = {
     if (this.floorNo >= THEMES.length) this.after(3.2, () => this.win());
     else this.after(1.8, () => {
       room.pickups.push({ type: 'portal', x: W / 2 + 100, y: H / 2 + 40, r: 28, t: 0 });
-      Sound.play('open'); this.toast('PORTAL OPENED - DESCEND', '#d65bff');
+      Sound.play('open'); this.toast('WHIRLPOOL OPENED - DIVE DEEPER', '#d65bff');
     });
   },
   nextFloor() {

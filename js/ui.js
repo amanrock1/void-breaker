@@ -38,7 +38,7 @@ const UI = {
     document.getElementById('ui').classList.remove('on');
   },
   refreshBest() {
-    document.getElementById('best').textContent = G.best ? 'BEST SCORE  ' + String(G.best).padStart(7, '0') : 'Reach the Void Core to win';
+    document.getElementById('best').textContent = G.best ? 'BEST SCORE  ' + String(G.best).padStart(7, '0') : 'Defeat the Kraken to win';
   },
 
   showCards(title, cards, cb) {

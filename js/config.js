@@ -4,7 +4,7 @@
    They are shown on the title screen and in the Credits screen.
    ========================================================== */
 const CONFIG = {
-  title: 'VOID BREAKER',
+  title: 'DEEP BREAKER',
   teamName: 'YOUR TEAM NAME',
   course: 'HTML Game Development - Group Project',
   team: [

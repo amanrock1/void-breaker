@@ -1,33 +1,33 @@
-# VOID BREAKER
+# DEEP BREAKER
 
-A neon roguelike twin-stick shooter that runs in the browser. Built with plain HTML5 Canvas and JavaScript. It needs no libraries, no build step and no image or audio files.
+An underwater submarine roguelike shooter that runs in the browser. Built with plain HTML5 Canvas and JavaScript. It needs no libraries, no build step and no image or audio files.
 
 **How to run:** double-click `index.html`. Chrome or Edge works best.
 Put your team name and members in `js/config.js`. They appear on the title screen and the Credits screen.
 
 ## The game
-Descend through **3 procedurally generated floors**. Each floor is a maze of rooms: combat rooms, a treasure room, a shop and a boss room. Doors lock until every enemy is dead. Each cleared room drops an upgrade orb, so every run builds a different character. Defeat the three bosses to win.
+Dive through **3 procedurally generated depths** (The Reef, The Shipwreck and The Abyss), piloting a yellow submarine. Each floor is a maze of rooms: combat rooms, a treasure room, a shop and a boss room. Doors lock until every enemy is dead. Each cleared room drops an upgrade orb, so every run builds a different character. Defeat the three sea-monster bosses (King Crab, The Angler and The Kraken) to win.
 
 | Controls | |
 |---|---|
-| WASD | move |
+| WASD | swim |
 | Mouse / hold left click | aim and shoot |
-| Space | dash (brief invincibility) |
+| Space | boost (brief invincibility) |
 | 1 2 3, Q, mouse wheel | switch weapon |
 | E | buy / take from a pedestal |
 | Esc | pause |
 | M | mute |
 
 ## Features
-- 3 themed floors, each with its own colours and generative music (tempo and key change)
+- 3 themed depths (coral reef, sunken shipwreck, deep abyss), each with its own look and generative music
 - Random room graph generation and 7 room layouts
-- 5 weapons: Pulse Pistol, Storm SMG, Scatter Cannon, Rail Lance and Nova Launcher
-- 16 stackable upgrades (multishot, ricochet, piercing, explosive rounds, homing, orbital blades, shield, and more)
-- 8 enemy types with different AI, plus elite variants
-- 3 multi-phase bosses built from a reusable attack library
+- 5 weapons: Harpoon Gun, Sonar Repeater, Flak Cannon, Rail Harpoon and Torpedo Launcher
+- 16 stackable upgrades (multishot, ricochet, piercing, explosive torpedoes, homing, spinning blades, pressure-hull shield, and more)
+- 8 sea creatures with different AI (piranha, minnow swarm, squid, swordfish, pufferfish, armored crab, urchin, giant clam), plus elite variants
+- 3 multi-phase sea-monster bosses built from a reusable attack library
 - Shop and treasure rooms, a coin economy, and a score combo system
 - Procedural sound effects and adaptive music, all made with the WebAudio API
-- Hand-built pixel-art characters with animation, eyes that track the player, and textured, themed floors and walls
+- Hand-built pixel-art characters with animation, eyes that track the player, and underwater scenery: sand and coral, wooden decks, glowing rock, light rays and rising bubbles
 - Particles, screen shake, hit-stop, glow rendering, a minimap, CRT scanlines, menus and credits
 - Best score saved with localStorage
 
@@ -64,33 +64,33 @@ Each member's part is below. "What" is the job, and "How" explains the code in s
 **What:** Everything the player does: moving, aiming, dashing, shooting, and the bullets.
 **How it works:**
 - Movement is **smoothed**: the speed moves toward the target speed a little each frame, so it feels slippery and not stiff.
-- **Dash:** pressing Space gives a fast burst (0.17 seconds) with a short invincibility window, then a 1.1 second cooldown.
+- **Boost:** pressing Space gives a fast burst (0.17 seconds) with a short invincibility window, then a 1.1 second cooldown.
 - **Shooting:** `fire()` makes one or more `Bullet` objects. The weapon's numbers (damage, speed, spread, pellets) come from `data.js`. A crit does 2.5x damage.
 - **Bullets** move in small steps so fast bullets can't skip through walls or enemies. One bullet class handles every special effect: pierce (goes through enemies), bounce (ricochets off walls), homing (steers toward the nearest enemy) and explode (area damage).
 - **Upgrades** just change numbers on the player (for example `dmgMul *= 1.2`). The bullet code reads those numbers when it fires.
 
 ### Member 3: AI Programmer, Enemies (`js/enemy.js`)
-**What:** The 8 enemy types and how each one thinks.
+**What:** The 8 sea creatures and how each one thinks.
 **How it works:**
 - One `Enemy` class. Inside `update()`, a `switch` on the enemy's `ai` field picks its behaviour:
   - **chase / swarm:** run at the player (swarmers wobble).
   - **shoot:** keep a distance, strafe, and fire aimed shots.
   - **dash:** a 4-step state machine: move, wind up (shows a yellow warning line), dash, rest.
-  - **bomber:** runs close, starts a fuse, then explodes. It also explodes if you kill it, and the blast hurts other enemies.
+  - **bomber (pufferfish):** swims close, puffs up, then explodes. It also explodes if you kill it, and the blast hurts other enemies.
   - **tank:** slow, and fires a 5-bullet spread after a short wind-up.
-  - **turret:** stands still and fires rings of bullets while rotating.
-  - **spawner:** floats around and spawns swarmers.
+  - **turret (urchin):** stays still and fires rings of spines while rotating.
+  - **spawner (giant clam):** drifts around and spawns minnows.
 - Every enemy has a 0.85 second **spawn warning** so they never appear on top of you.
 - **Elite enemies** (gold dashed ring) have more health and damage and give triple score.
 - Enemy health and damage **scale with the floor number**, and enemies gently push each other apart so they don't stack.
 
 ### Member 4: Boss Designer & Programmer (`js/boss.js`)
-**What:** The three bosses: The Warden, Hive Mother and The Void Core.
+**What:** The three bosses: The King Crab, The Angler and The Kraken.
 **How it works:**
 - `Boss` extends `Enemy`, so it reuses health, damage and hit effects.
 - Each attack is a **method** named `atk_<name>()` (for example `atk_ring`, `atk_spiral`, `atk_charge`). The method runs every frame and returns `true` when it is finished. The boss then waits a moment and picks the next attack.
 - The boss has **3 phases**, which change at 62% and 30% of its health. In later phases, attacks fire more bullets and the waits get shorter.
-- `data.js` lists which attacks each boss can use and in which phase. The Warden uses 4 attacks and the Void Core uses 6, all built from the same attack library, so adding a new boss is quick.
+- `data.js` lists which attacks each boss can use and in which phase. The King Crab uses 4 attacks and the Kraken uses 6, all built from the same attack library, so adding a new boss is quick.
 - Bosses have a 1.6 second intro where they can't be hurt, while the name banner shows.
 
 ### Member 5: Level Designer, Floors & Rooms (`js/world.js`)
@@ -99,8 +99,8 @@ Each member's part is below. "What" is the job, and "How" explains the code in s
 - `generateFloor()` starts with one room in the middle of a 5x5 grid. It repeatedly picks an existing room and tries to grow a new room next to it. A new room may only touch **one** existing room, so the map is a tree with no loops.
 - The room farthest from the start becomes the **boss room**. Two other dead-end rooms become the **treasure room** and the **shop**.
 - 7 room layouts (`ROOM_TEMPLATES` in `data.js`) place obstacles. Door lanes are kept clear so you can always walk through.
-- For speed, `bakeRoom()` draws the room's background **once** onto a hidden canvas (floor tiles, brick walls, obstacles, door gaps). Each frame the game just copies that image.
-- Each floor has its own decoration style: metal plates and hazard stripes (Foundry), moss and grass (Overgrowth), glowing cracks and crystals (Void).
+- For speed, `bakeRoom()` draws the room's background **once** onto a hidden canvas (floor tiles, rock walls, obstacles, door gaps). Each frame the game just copies that image.
+- Each depth has its own scenery: sand, shells and seaweed with coral blocks (Reef), wooden deck planks with crates (Shipwreck), dark rock with glowing cracks and crystals (Abyss).
 
 ### Member 6: UI / UX Designer & Programmer (`index.html`, `css/style.css`, `js/ui.js`, `js/config.js`)
 **What:** All the menus and screens.
@@ -124,7 +124,7 @@ Each member's part is below. "What" is the job, and "How" explains the code in s
 - **Pixel art in code:** a small painter class (`Px`) draws each character pixel by pixel into a small image, once at start-up. It has tools for shaded rectangles, shaded ellipses (lit from above in 4 tones so they look round), polygons and an automatic dark outline. Characters are painted on the left half and **mirrored**, so they are symmetrical.
 - **Living characters:** sprites bob and squash while moving, flash white when hit, and the **pupils follow the player**.
 - **`fx.js`:** particles (sparks, explosions), floating damage numbers, expanding rings, screen shake and a short slow-motion "hit-stop" when the player is hurt. Glow is a pre-made soft sprite, which is much faster than real blur.
-- **`render.js`:** draws everything in layers (background, doors, pickups, enemies, player, bullets, effects), then the vignette, HUD, minimap and banners.
+- **`render.js`:** draws everything in layers (background, doors, pickups, enemies, player, bullets, underwater light rays and bubbles, effects), then the vignette, HUD, minimap and banners.
 - **`data.js`:** every weapon, upgrade, enemy and boss is listed as data (health, speed, damage, color). Balancing the game means editing numbers here, with no code changes.
 - **QA:** the whole game was played through repeatedly to find bugs and tune difficulty.
 

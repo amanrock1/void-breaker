@@ -177,7 +177,7 @@ class Enemy {
     }
     // shadow & glow
     const sc = 2 * (this.r / d.r), floaty = d.ai === 'shoot' || d.ai === 'spawner';
-    g.fillStyle = 'rgba(0,0,0,.38)'; g.beginPath(); g.ellipse(this.x, this.y + this.r * (floaty ? 1.5 : 1), this.r * (floaty ? 0.8 : 1), this.r * 0.38, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(0,0,0,.15)'; g.beginPath(); g.ellipse(this.x, this.y + this.r * (floaty ? 1.5 : 1), this.r * (floaty ? 0.8 : 1), this.r * 0.38, 0, 0, TAU); g.fill();
     g.globalCompositeOperation = 'lighter'; g.globalAlpha = this.elite ? 0.6 : 0.24;
     g.drawImage(FX.glow(this.elite ? '#ffd24d' : c, 64), this.x - this.r * 2.4, this.y - this.r * 2.4, this.r * 4.8, this.r * 4.8);
     g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
@@ -192,14 +192,9 @@ class Enemy {
     if (fusing) { const k = 1 + (1 - this.st / 0.6) * 0.25; sx = k; sy = k; }
     const look = { x: p.x - this.x, y: p.y - this.y }, flip = p.x < this.x ? -1 : 1;
     if (d.ai === 'turret') {
-      for (let i = 0; i < 4; i++) { const a = this.ang + i * TAU / 4; Sprites.draw(g, 'turret_barrel', this.x + Math.cos(a) * 14, this.y + Math.sin(a) * 14, { scale: 2, rot: a, flash }); }
+      for (let i = 0; i < 4; i++) { const a = this.ang + i * TAU / 4; Sprites.draw(g, 'turret_barrel', this.x + Math.cos(a) * 17, this.y + Math.sin(a) * 17, { scale: 2, rot: a, flash }); }
     }
     Sprites.draw(g, this.type, this.x, this.y, { scale: sc, flip, bob, sx, sy, flash, look });
-    if (d.ai === 'bomber') {
-      g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.6 + Math.random() * 0.4;
-      g.drawImage(FX.glow('#ffd24d', 64), this.x + flip * 8 * sc / 2 * 1.0 - 14, this.y - 20 * sc / 2 + bob - 14, 28, 28);
-      g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
-    }
     if (this.elite) {
       g.strokeStyle = 'rgba(255,210,77,.85)'; g.lineWidth = 2; g.setLineDash([5, 4]); g.lineDashOffset = -this.t * 20;
       g.beginPath(); g.arc(this.x, this.y, this.r + 7, 0, TAU); g.stroke(); g.setLineDash([]);

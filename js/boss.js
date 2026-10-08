@@ -168,7 +168,7 @@ class Boss extends Enemy {
       g.strokeStyle = 'rgba(255,80,80,' + (0.3 + Math.sin(this.t * 40) * 0.2) + ')'; g.lineWidth = this.r * 1.6;
       g.beginPath(); g.moveTo(this.x, this.y); g.lineTo(this.x + Math.cos(this.a.ang) * 700, this.y + Math.sin(this.a.ang) * 700); g.stroke();
     }
-    g.fillStyle = 'rgba(0,0,0,.4)'; g.beginPath(); g.ellipse(this.x, this.y + this.r * (this.key === 'core' ? 1.5 : 1.0), this.r * 0.95, this.r * 0.36, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(0,0,0,.16)'; g.beginPath(); g.ellipse(this.x, this.y + this.r * (this.key === 'warden' ? 1.0 : 1.5), this.r * 0.95, this.r * 0.3, 0, 0, TAU); g.fill();
     g.globalCompositeOperation = 'lighter';
     g.globalAlpha *= 0.5 + Math.sin(this.t * 3) * 0.1;
     g.drawImage(FX.glow(c, 128), this.x - this.r * 3, this.y - this.r * 3, this.r * 6, this.r * 6);
@@ -188,6 +188,11 @@ class Boss extends Enemy {
       scale: 2, bob, sx: pulse, sy: pulse * (1 - Math.sin(this.t * 3) * 0.015), flash, look,
       flip: this.key === 'warden' && look.x < 0 ? -1 : 1, pupil: this.key === 'core' ? '#1a0630' : '#1a0814'
     });
+    if (this.key === 'hive') {   // glowing angler lure
+      const a0 = g.globalAlpha; g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.65 + Math.sin(this.t * 5) * 0.3;
+      g.drawImage(FX.glow('#ffe14d', 64), this.x + 12 - 36, this.y - 40 + bob - 36, 72, 72);
+      g.globalAlpha = a0; g.globalCompositeOperation = 'source-over';
+    }
     g.globalAlpha = 1;
   }
 }
