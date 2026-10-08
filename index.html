@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VOID BREAKER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game" width="960" height="600"></canvas>
+  <div id="crt"></div>
+
+  <div id="ui">
+    <section id="s-title" class="screen show">
+      <p class="eyebrow" id="course"></p>
+      <h1 id="game-title"></h1>
+      <p class="tag">Descend through three floors. Break every boss. Escape the void.</p>
+      <div class="menu">
+        <button id="b-play" class="big">&#9654; PLAY</button>
+        <button id="b-help">HOW TO PLAY</button>
+        <button id="b-credits">CREDITS</button>
+      </div>
+      <p class="best" id="best"></p>
+      <p class="foot">A game by <b id="team-name"></b> &nbsp;|&nbsp; press <kbd>ENTER</kbd> to start &nbsp;|&nbsp; <kbd>M</kbd> mute</p>
+    </section>
+
+    <section id="s-help" class="screen">
+      <h2>HOW TO PLAY</h2>
+      <div class="cols">
+        <div class="panel">
+          <h4>CONTROLS</h4>
+          <p><kbd>W A S D</kbd> move</p>
+          <p><kbd>MOUSE</kbd> aim &amp; hold <kbd>LEFT CLICK</kbd> to fire</p>
+          <p><kbd>SPACE</kbd> dash (invincible for a moment)</p>
+          <p><kbd>1 2 3</kbd> / <kbd>Q</kbd> / wheel &mdash; switch weapon</p>
+          <p><kbd>E</kbd> buy / pick up from pedestals</p>
+          <p><kbd>ESC</kbd> pause &nbsp; <kbd>M</kbd> mute</p>
+        </div>
+        <div class="panel">
+          <h4>HOW IT WORKS</h4>
+          <p>Every floor is a randomly generated maze of rooms. Doors lock until you destroy every enemy.</p>
+          <p>Cleared rooms drop a glowing <b class="y">UPGRADE ORB</b> - walk into it and choose 1 of 3 upgrades.</p>
+          <p><b class="g">TREASURE</b> rooms offer a free weapon. <b class="g">SHOP</b> rooms sell items for coins.</p>
+          <p>Defeat the floor boss to open the portal downward. Kill quickly to build a score combo!</p>
+        </div>
+      </div>
+      <button class="back">BACK</button>
+    </section>
+
+    <section id="s-credits" class="screen">
+      <h2>THE TEAM</h2>
+      <div id="credits-list"></div>
+      <button class="back">BACK</button>
+    </section>
+
+    <section id="s-cards" class="screen">
+      <h2 id="cards-title">CHOOSE AN UPGRADE</h2>
+      <div id="cards"></div>
+      <p class="hint">Click a card or press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></p>
+    </section>
+
+    <section id="s-pause" class="screen">
+      <h2>PAUSED</h2>
+      <div class="menu">
+        <button id="b-resume" class="big">&#9654; RESUME</button>
+        <button id="b-quit">QUIT TO MENU</button>
+      </div>
+    </section>
+
+    <section id="s-over" class="screen">
+      <h2 class="red">SYSTEM FAILURE</h2>
+      <div class="stats">
+        <div><span>SCORE</span><b id="o-score"></b></div>
+        <div><span>FLOOR</span><b id="o-floor"></b></div>
+        <div><span>KILLS</span><b id="o-kills"></b></div>
+        <div><span>TIME</span><b id="o-time"></b></div>
+        <div><span>UPGRADES</span><b id="o-upg"></b></div>
+        <div><span>BEST</span><b id="o-best"></b></div>
+      </div>
+      <div class="menu"><button id="b-retry" class="big">&#8635; TRY AGAIN</button><button id="b-menu">MENU</button></div>
+      <p class="foot">press <kbd>R</kbd> to retry</p>
+    </section>
+
+    <section id="s-win" class="screen">
+      <h2 class="gold">VOID BROKEN</h2>
+      <p class="tag">You destroyed the Void Core and escaped the abyss.</p>
+      <div class="stats">
+        <div><span>SCORE</span><b id="w-score"></b></div>
+        <div><span>FLOORS</span><b id="w-floor"></b></div>
+        <div><span>KILLS</span><b id="w-kills"></b></div>
+        <div><span>TIME</span><b id="w-time"></b></div>
+        <div><span>UPGRADES</span><b id="w-upg"></b></div>
+        <div><span>BEST</span><b id="w-best"></b></div>
+      </div>
+      <div class="menu"><button id="b-retry2" class="big">&#8635; PLAY AGAIN</button><button id="b-menu2">MENU</button></div>
+    </section>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/util.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/data.js"></script>
+<script src="js/player.js"></script>
+<script src="js/enemy.js"></script>
+<script src="js/boss.js"></script>
+<script src="js/world.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/render.js"></script>
+<script src="js/game.js"></script>
+<script>window.addEventListener('load', function () { G.init(); });</script>
+</body>
+</html>
