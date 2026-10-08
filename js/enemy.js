@@ -176,40 +176,35 @@ class Enemy {
       g.beginPath(); g.arc(this.x, this.y, 80, 0, TAU); g.fill(); g.stroke();
     }
     // shadow & glow
-    g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(this.x, this.y + this.r * 0.9, this.r, this.r * 0.4, 0, 0, TAU); g.fill();
-    g.globalCompositeOperation = 'lighter'; g.globalAlpha = this.elite ? 0.6 : 0.3;
+    const sc = 2 * (this.r / d.r), floaty = d.ai === 'shoot' || d.ai === 'spawner';
+    g.fillStyle = 'rgba(0,0,0,.38)'; g.beginPath(); g.ellipse(this.x, this.y + this.r * (floaty ? 1.5 : 1), this.r * (floaty ? 0.8 : 1), this.r * 0.38, 0, 0, TAU); g.fill();
+    g.globalCompositeOperation = 'lighter'; g.globalAlpha = this.elite ? 0.6 : 0.24;
     g.drawImage(FX.glow(this.elite ? '#ffd24d' : c, 64), this.x - this.r * 2.4, this.y - this.r * 2.4, this.r * 4.8, this.r * 4.8);
     g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
 
-    let rot = this.face;
-    if (d.ai === 'turret') rot = this.ang; else if (d.ai === 'spawner') rot = this.ang; else if (d.ai === 'bomber') rot = this.t * 2;
-    const flash = this.hitT > 0 || (this.state === 'fuse' && Math.floor(this.t * 18) % 2 === 0);
-    g.fillStyle = flash ? '#ffffff' : rgba(c, 0.22);
-    g.strokeStyle = flash ? '#ffffff' : c; g.lineWidth = this.elite ? 3.5 : 2.5; g.lineJoin = 'round';
-    const slowTint = this.slowT > 0;
-    polygon(g, this.x, this.y, this.r, d.sides, rot); g.fill(); g.stroke();
-    if (this.elite) { g.strokeStyle = '#ffd24d'; g.lineWidth = 1.5; polygon(g, this.x, this.y, this.r + 4, d.sides, rot); g.stroke(); }
-    if (slowTint) { g.strokeStyle = '#9fe8ff'; g.lineWidth = 1.5; g.beginPath(); g.arc(this.x, this.y, this.r + 2, 0, TAU); g.stroke(); }
-
-    // inner details per type
-    g.fillStyle = flash ? '#fff' : c;
-    switch (d.ai) {
-      case 'chase': case 'swarm': case 'dash':
-        g.beginPath(); g.arc(this.x + Math.cos(this.face) * this.r * 0.35, this.y + Math.sin(this.face) * this.r * 0.35, this.r * 0.28, 0, TAU); g.fill(); break;
-      case 'shoot':
-        g.beginPath(); g.arc(this.x, this.y, this.r * 0.3, 0, TAU); g.fill();
-        g.lineWidth = 3; g.strokeStyle = c; g.beginPath(); g.moveTo(this.x, this.y); g.lineTo(this.x + Math.cos(this.face) * this.r * 1.3, this.y + Math.sin(this.face) * this.r * 1.3); g.stroke(); break;
-      case 'tank':
-        g.beginPath(); g.arc(this.x, this.y, this.r * (this.state === 'fire' ? 0.55 : 0.35), 0, TAU); g.fill();
-        g.lineWidth = 5; g.strokeStyle = c; g.beginPath(); g.moveTo(this.x, this.y); g.lineTo(this.x + Math.cos(this.face) * this.r * 1.2, this.y + Math.sin(this.face) * this.r * 1.2); g.stroke(); break;
-      case 'turret':
-        for (let i = 0; i < 4; i++) { const a = this.ang + i * TAU / 4; g.fillRect(this.x + Math.cos(a) * this.r * 0.8 - 2.5, this.y + Math.sin(a) * this.r * 0.8 - 2.5, 5, 5); }
-        g.beginPath(); g.arc(this.x, this.y, this.r * 0.3, 0, TAU); g.fill(); break;
-      case 'spawner':
-        g.globalAlpha = 0.6 + Math.sin(this.t * 4) * 0.3; g.beginPath(); g.arc(this.x, this.y, this.r * 0.45, 0, TAU); g.fill(); g.globalAlpha = 1; break;
-      case 'bomber':
-        g.beginPath(); g.arc(this.x, this.y, this.r * 0.4, 0, TAU); g.fill(); break;
+    const p = G.player, fusing = this.state === 'fuse';
+    const flash = this.hitT > 0 || (fusing && Math.floor(this.t * 18) % 2 === 0);
+    const wob = Math.sin(this.t * (d.ai === 'swarm' ? 22 : 9) + this.ang);
+    const bob = wob * (floaty ? 2.6 : d.ai === 'turret' ? 0 : 1.6);
+    let sx = 1 + wob * 0.045, sy = 1 - wob * 0.045;
+    if (d.ai === 'spawner') { const pl = 1 + Math.sin(this.t * 4) * 0.06; sx = pl; sy = pl; }
+    if (this.state === 'wind' || this.state === 'fire') { sx = 1.12; sy = 0.88; }
+    if (fusing) { const k = 1 + (1 - this.st / 0.6) * 0.25; sx = k; sy = k; }
+    const look = { x: p.x - this.x, y: p.y - this.y }, flip = p.x < this.x ? -1 : 1;
+    if (d.ai === 'turret') {
+      for (let i = 0; i < 4; i++) { const a = this.ang + i * TAU / 4; Sprites.draw(g, 'turret_barrel', this.x + Math.cos(a) * 14, this.y + Math.sin(a) * 14, { scale: 2, rot: a, flash }); }
     }
+    Sprites.draw(g, this.type, this.x, this.y, { scale: sc, flip, bob, sx, sy, flash, look });
+    if (d.ai === 'bomber') {
+      g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.6 + Math.random() * 0.4;
+      g.drawImage(FX.glow('#ffd24d', 64), this.x + flip * 8 * sc / 2 * 1.0 - 14, this.y - 20 * sc / 2 + bob - 14, 28, 28);
+      g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+    }
+    if (this.elite) {
+      g.strokeStyle = 'rgba(255,210,77,.85)'; g.lineWidth = 2; g.setLineDash([5, 4]); g.lineDashOffset = -this.t * 20;
+      g.beginPath(); g.arc(this.x, this.y, this.r + 7, 0, TAU); g.stroke(); g.setLineDash([]);
+    }
+    if (this.slowT > 0) { g.strokeStyle = '#9fe8ff'; g.lineWidth = 1.5; g.beginPath(); g.arc(this.x, this.y, this.r + 3, 0, TAU); g.stroke(); }
     // health bar when damaged
     if (this.hp < this.maxHp) {
       const w = Math.max(22, this.r * 2), bx = this.x - w / 2, by = this.y - this.r - 10;

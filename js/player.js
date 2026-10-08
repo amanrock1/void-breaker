@@ -110,7 +110,7 @@ class Player {
       const crit = Math.random() < this.crit;
       let dmg = w.dmg * this.dmgMul * (1 - 0.07 * this.multi);
       if (crit) dmg *= 2.5;
-      const b = new Bullet(this.x + Math.cos(this.aim) * 16, this.y + Math.sin(this.aim) * 16, a, w.speed, dmg, true);
+      const b = new Bullet(this.x + Math.cos(this.aim) * w.muzzle, this.y + 2 + Math.sin(this.aim) * w.muzzle, a, w.speed, dmg, true);
       b.r = w.size; b.color = crit ? '#ffffff' : w.color; b.glowColor = w.color; b.life = w.life;
       b.pierce = (w.pierce || 0) + this.pierce; b.bounce = this.bounce;
       b.explode = Math.max(w.explode || 0, this.explode ? 38 + this.explode * 16 : 0);
@@ -120,7 +120,7 @@ class Player {
     }
     this.fireT = 1 / (w.rate * this.rateMul);
     Sound.play(w.sfx); FX.addShake(w.shake);
-    const mx = this.x + Math.cos(this.aim) * 20, my = this.y + Math.sin(this.aim) * 20;
+    const mx = this.x + Math.cos(this.aim) * w.muzzle, my = this.y + 2 + Math.sin(this.aim) * w.muzzle;
     FX.spark(mx, my, this.aim, 3, w.color, 240);
     this.vx -= Math.cos(this.aim) * w.kick * 0.25; this.vy -= Math.sin(this.aim) * w.kick * 0.25;
   }
@@ -137,26 +137,23 @@ class Player {
   draw(g) {
     const flick = this.invuln > 0 && Math.floor(this.invuln * 25) % 2 === 0 && this.hurtT > 0;
     if (flick) return;
+    const dashing = this.dashT > 0, moving = this.moving || dashing;
+    const flip = Math.cos(this.aim) < 0 ? -1 : 1;
+    const bob = moving ? -Math.abs(Math.sin(G.anim * 15)) * 3 : Math.sin(G.anim * 3) * 0.8;
     // shadow + glow
-    g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(this.x, this.y + 11, 12, 5, 0, 0, TAU); g.fill();
-    g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.5;
-    g.drawImage(FX.glow('#7df9ff', 64), this.x - 34, this.y - 34, 68, 68);
+    g.fillStyle = 'rgba(0,0,0,.4)'; g.beginPath(); g.ellipse(this.x, this.y + 17, 12, 4.5, 0, 0, TAU); g.fill();
+    g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.28;
+    g.drawImage(FX.glow('#7df9ff', 64), this.x - 38, this.y - 38, 76, 76);
     g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
-    // thruster
-    if (this.moving || this.dashT > 0) {
-      const ta = Math.atan2(this.vy, this.vx) + Math.PI;
-      g.fillStyle = 'rgba(255,170,60,.85)';
-      g.beginPath(); g.moveTo(this.x + Math.cos(ta + 0.5) * 8, this.y + Math.sin(ta + 0.5) * 8);
-      g.lineTo(this.x + Math.cos(ta) * (14 + Math.random() * 6), this.y + Math.sin(ta) * (14 + Math.random() * 6));
-      g.lineTo(this.x + Math.cos(ta - 0.5) * 8, this.y + Math.sin(ta - 0.5) * 8); g.fill();
-    }
-    // body (points where aiming)
-    g.save(); g.translate(this.x, this.y); g.rotate(this.aim);
-    g.fillStyle = this.dashT > 0 ? '#ffffff' : '#0c2a3a';
-    g.strokeStyle = '#7df9ff'; g.lineWidth = 2.5; g.lineJoin = 'round';
-    g.beginPath(); g.moveTo(15, 0); g.lineTo(-10, 10); g.lineTo(-5, 0); g.lineTo(-10, -10); g.closePath(); g.fill(); g.stroke();
-    g.fillStyle = '#7df9ff'; g.beginPath(); g.arc(2, 0, 3, 0, TAU); g.fill();
-    g.restore();
+    const gun = 'gun_' + this.weapons[this.wi], behind = Math.sin(this.aim) < -0.45;
+    const gy = this.y + 3 + bob * 0.6, kick = Math.max(0, this.fireT * 0.6) * 2;
+    if (behind) Sprites.drawGun(g, gun, this.x - Math.cos(this.aim) * kick, gy - Math.sin(this.aim) * kick, this.aim);
+    Sprites.draw(g, 'player', this.x, this.y + 2, {
+      scale: 2, flip, bob, flash: dashing || this.hurtT > 0.22,
+      sx: dashing ? 1.25 : 1 + (moving ? Math.sin(G.anim * 30) * 0.03 : 0), sy: dashing ? 0.85 : 1,
+      rot: moving ? Math.sin(G.anim * 15) * 0.07 : 0
+    });
+    if (!behind) Sprites.drawGun(g, gun, this.x - Math.cos(this.aim) * kick, gy - Math.sin(this.aim) * kick, this.aim);
     // shield
     if (this.shield > 0) {
       g.strokeStyle = 'rgba(125,249,255,' + (0.5 + Math.sin(G.anim * 6) * 0.2) + ')'; g.lineWidth = 2;

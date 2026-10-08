@@ -27,6 +27,7 @@ Descend through **3 procedurally generated floors**. Each floor is a maze of roo
 - 3 multi-phase bosses built from a reusable attack library
 - Shop and treasure rooms, a coin economy, and a score combo system
 - Procedural sound effects and adaptive music, all made with the WebAudio API
+- Hand-built pixel-art characters with animation, eyes that track the player, and textured, themed floors and walls
 - Particles, screen shake, hit-stop, glow rendering, a minimap, CRT scanlines, menus and credits
 - Best score saved with localStorage
 
@@ -40,6 +41,7 @@ Descend through **3 procedurally generated floors**. Each floor is a maze of roo
 | `js/world.js` | floor generation, room layouts, background rendering | Level Designer |
 | `js/ui.js`, `index.html`, `css/style.css` | menus, upgrade cards, overlays | UI/UX |
 | `js/audio.js` | sound effects and music | Audio Designer |
+| `js/sprites.js` | pixel-art painter that draws every character (player, enemies, bosses) in code | Artist / VFX |
 | `js/fx.js`, `js/render.js` | particles, HUD, minimap, drawing | VFX |
 | `js/data.js` | all weapons, upgrades, enemies and bosses as data, for balancing | QA / Balance |
 | `js/util.js` | math helpers and input | shared |

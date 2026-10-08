@@ -5,17 +5,17 @@
    ========================================================== */
 
 const THEMES = [
-  { name: 'THE FOUNDRY', sub: 'Floor 1', bg: '#07111d', grid: '#10304a', wall: '#0c1829', edge: '#38e1ff', bpm: 122, prog: [38, 38, 41, 36], boss: 'warden' },
-  { name: 'THE OVERGROWTH', sub: 'Floor 2', bg: '#07150d', grid: '#12402b', wall: '#0a1c12', edge: '#5dff8a', bpm: 132, prog: [40, 43, 38, 41], boss: 'hive' },
-  { name: 'THE VOID', sub: 'Floor 3', bg: '#10061b', grid: '#34115a', wall: '#170a26', edge: '#d65bff', bpm: 142, prog: [36, 39, 34, 41], boss: 'core' }
+  { name: 'THE FOUNDRY', sub: 'Floor 1', bg: '#07111d', grid: '#10304a', wall: '#0c1829', edge: '#38e1ff', bpm: 122, prog: [38, 38, 41, 36], boss: 'warden', deco: 'forge', brick: '#16263c' },
+  { name: 'THE OVERGROWTH', sub: 'Floor 2', bg: '#07150d', grid: '#12402b', wall: '#0a1c12', edge: '#5dff8a', bpm: 132, prog: [40, 43, 38, 41], boss: 'hive', deco: 'moss', brick: '#152a1c' },
+  { name: 'THE VOID', sub: 'Floor 3', bg: '#10061b', grid: '#34115a', wall: '#170a26', edge: '#d65bff', bpm: 142, prog: [36, 39, 34, 41], boss: 'core', deco: 'void', brick: '#24123a' }
 ];
 
 const WEAPONS = {
-  pistol:   { name: 'Pulse Pistol',   desc: 'Reliable and accurate.',        dmg: 11, rate: 5.0, speed: 640, spread: 0.03, pellets: 1, fan: 0.12, size: 4,   life: 1.2,  color: '#7df9ff', sfx: 'pistol',   shake: 0.4, kick: 20 },
-  smg:      { name: 'Storm SMG',      desc: 'Hail of fast, weak bullets.',   dmg: 5.5, rate: 13, speed: 700, spread: 0.13, pellets: 1, fan: 0.1,  size: 3.2, life: 1.0,  color: '#a5ff7d', sfx: 'smg',      shake: 0.3, kick: 12 },
-  shotgun:  { name: 'Scatter Cannon', desc: 'Devastating at close range.',   dmg: 7,  rate: 1.7, speed: 600, spread: 0.1,  pellets: 6, fan: 0.17, size: 3.8, life: 0.5,  color: '#ffb347', sfx: 'shotgun',  shake: 3.5, kick: 130 },
-  rail:     { name: 'Rail Lance',     desc: 'Piercing beam. Hits everything in a line.', dmg: 46, rate: 1.15, speed: 1600, spread: 0, pellets: 1, fan: 0.1, size: 4.5, life: 0.9, color: '#fff27d', sfx: 'rail', shake: 4, kick: 160, pierce: 99 },
-  launcher: { name: 'Nova Launcher',  desc: 'Explosive rockets. Big boom.',  dmg: 22, rate: 1.5, speed: 390, spread: 0.02, pellets: 1, fan: 0.2,  size: 7,   life: 2.0,  color: '#ff7a3d', sfx: 'launcher', shake: 3,   kick: 90, explode: 78 }
+  pistol:   { name: 'Pulse Pistol',   desc: 'Reliable and accurate.',        dmg: 11, rate: 5.0, speed: 640, spread: 0.03, pellets: 1, fan: 0.12, size: 4,   life: 1.2,  color: '#7df9ff', sfx: 'pistol',   shake: 0.4, kick: 20, muzzle: 19 },
+  smg:      { name: 'Storm SMG',      desc: 'Hail of fast, weak bullets.',   dmg: 5.5, rate: 13, speed: 700, spread: 0.13, pellets: 1, fan: 0.1,  size: 3.2, life: 1.0,  color: '#a5ff7d', sfx: 'smg',      shake: 0.3, kick: 12, muzzle: 25 },
+  shotgun:  { name: 'Scatter Cannon', desc: 'Devastating at close range.',   dmg: 7,  rate: 1.7, speed: 600, spread: 0.1,  pellets: 6, fan: 0.17, size: 3.8, life: 0.5,  color: '#ffb347', sfx: 'shotgun',  shake: 3.5, kick: 130, muzzle: 33 },
+  rail:     { name: 'Rail Lance',     desc: 'Piercing beam. Hits everything in a line.', dmg: 46, rate: 1.15, speed: 1600, spread: 0, pellets: 1, fan: 0.1, size: 4.5, life: 0.9, color: '#fff27d', sfx: 'rail', shake: 4, kick: 160, pierce: 99, muzzle: 37 },
+  launcher: { name: 'Nova Launcher',  desc: 'Explosive rockets. Big boom.',  dmg: 22, rate: 1.5, speed: 390, spread: 0.02, pellets: 1, fan: 0.2,  size: 7,   life: 2.0,  color: '#ff7a3d', sfx: 'launcher', shake: 3,   kick: 90, explode: 78, muzzle: 33 }
 };
 
 /* rarity: weight when rolling cards (rare cards appear less often) */

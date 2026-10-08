@@ -133,14 +133,13 @@ const Render = {
           g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.5;
           g.drawImage(FX.glow('#ffe14d', 64), k.x - 14, k.y - 14, 28, 28);
           g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
-          g.fillStyle = '#ffe14d'; g.strokeStyle = '#a07b00'; g.lineWidth = 1.5;
-          g.beginPath(); g.ellipse(k.x, k.y + bob, Math.abs(Math.cos(k.t * 5)) * 5 + 1, 6, 0, 0, TAU); g.fill(); g.stroke();
+          Sprites.draw(g, 'coin', k.x, k.y + bob, { scale: 1.5, sx: Math.abs(Math.cos(k.t * 5)) * 0.8 + 0.2 });
           break;
         }
         case 'heart': {
-          g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.5; g.drawImage(FX.glow('#6dff9e', 64), k.x - 18, k.y - 18, 36, 36);
+          g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.5; g.drawImage(FX.glow('#ff5d7a', 64), k.x - 18, k.y - 18, 36, 36);
           g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
-          g.fillStyle = '#6dff9e'; g.fillRect(k.x - 2.5, k.y - 7 + bob, 5, 14); g.fillRect(k.x - 7, k.y - 2.5 + bob, 14, 5);
+          Sprites.draw(g, 'heart', k.x, k.y + bob, { scale: 1.5, sy: 1 + Math.sin(k.t * 7) * 0.08, sx: 1 + Math.sin(k.t * 7) * 0.08 });
           break;
         }
         case 'orb': {

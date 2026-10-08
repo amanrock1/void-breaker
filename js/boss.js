@@ -168,27 +168,26 @@ class Boss extends Enemy {
       g.strokeStyle = 'rgba(255,80,80,' + (0.3 + Math.sin(this.t * 40) * 0.2) + ')'; g.lineWidth = this.r * 1.6;
       g.beginPath(); g.moveTo(this.x, this.y); g.lineTo(this.x + Math.cos(this.a.ang) * 700, this.y + Math.sin(this.a.ang) * 700); g.stroke();
     }
-    g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(this.x, this.y + this.r * 0.95, this.r, this.r * 0.4, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(0,0,0,.4)'; g.beginPath(); g.ellipse(this.x, this.y + this.r * (this.key === 'core' ? 1.5 : 1.0), this.r * 0.95, this.r * 0.36, 0, 0, TAU); g.fill();
     g.globalCompositeOperation = 'lighter';
-    g.globalAlpha *= 0.55 + Math.sin(this.t * 3) * 0.1;
+    g.globalAlpha *= 0.5 + Math.sin(this.t * 3) * 0.1;
     g.drawImage(FX.glow(c, 128), this.x - this.r * 3, this.y - this.r * 3, this.r * 6, this.r * 6);
     g.globalCompositeOperation = 'source-over'; g.globalAlpha = intro ? 0.5 : this.alpha;
 
-    const flash = this.hitT > 0;
-    g.lineJoin = 'round';
-    // outer rotating shell
-    g.strokeStyle = flash ? '#fff' : c; g.lineWidth = 3;
-    polygon(g, this.x, this.y, this.r + 8, this.def.sides, this.t * 0.6); g.stroke();
-    polygon(g, this.x, this.y, this.r + 15, this.def.sides, -this.t * 0.4); g.globalAlpha *= 0.4; g.stroke();
-    g.globalAlpha = intro ? 0.5 : this.alpha;
-    // body
-    g.fillStyle = flash ? '#fff' : rgba(c, 0.25); g.lineWidth = 4;
-    polygon(g, this.x, this.y, this.r, this.def.sides, this.face * 0.2 + this.t * 0.3); g.fill(); g.stroke();
-    // core eye
-    const pulse = 0.5 + Math.sin(this.t * 6) * 0.15 + (this.cur ? 0.2 : 0);
-    g.fillStyle = flash ? '#fff' : c;
-    g.beginPath(); g.arc(this.x + Math.cos(this.face) * 6, this.y + Math.sin(this.face) * 6, this.r * 0.4 * pulse + 6, 0, TAU); g.fill();
-    g.fillStyle = '#fff'; g.beginPath(); g.arc(this.x + Math.cos(this.face) * 10, this.y + Math.sin(this.face) * 10, this.r * 0.14, 0, TAU); g.fill();
+    const flash = this.hitT > 0 ? 0.35 : 0, charging = this.cur && (this.a.state === 'wind' || this.cur === 'summon');
+    const float = this.key !== 'warden', bob = Math.sin(this.t * (float ? 2.2 : 3)) * (float ? 5 : 2);
+    const pulse = charging ? 1 + Math.sin(this.t * 30) * 0.03 : 1;
+    const look = { x: G.player.x - this.x, y: G.player.y - this.y };
+    if (this.key === 'core') {
+      for (let i = 0; i < 4; i++) {
+        const an = this.t * 1.2 + i * TAU / 4, rr = 66 + Math.sin(this.t * 2 + i) * 6;
+        Sprites.draw(g, 'shard', this.x + Math.cos(an) * rr, this.y + Math.sin(an) * rr * 0.8, { scale: 2, rot: an + Math.PI / 2, flash });
+      }
+    }
+    Sprites.draw(g, 'boss_' + this.key, this.x, this.y, {
+      scale: 2, bob, sx: pulse, sy: pulse * (1 - Math.sin(this.t * 3) * 0.015), flash, look,
+      flip: this.key === 'warden' && look.x < 0 ? -1 : 1, pupil: this.key === 'core' ? '#1a0630' : '#1a0814'
+    });
     g.globalAlpha = 1;
   }
 }

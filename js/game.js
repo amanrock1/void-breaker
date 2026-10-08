@@ -15,6 +15,7 @@ const G = {
     this.ctx = this.canvas.getContext('2d');
     Input.init(this.canvas);
     UI.init();
+    Sprites.init();
     Render.init(this.ctx);
     try { this.best = +localStorage.getItem('voidbreaker.best') || 0; } catch (e) { }
     UI.refreshBest();
